@@ -2,7 +2,12 @@ package com.louis;
 
 import org.immutables.value.Value;
 import java.lang.String;
-//Define abstract value type using interface, abstract class or annotation
+
+/**
+ * Defines a HashTable entry.
+ * 
+ * Each entry consists of a key and an associated value. Both can be retrieved.
+ */
 @Value.Immutable
 public interface HashEntry {
 	String getKey();
