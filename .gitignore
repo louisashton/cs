@@ -1,2 +1,5 @@
 build
 .gradle
+.metadata
+.recommenders
+HackerRank
