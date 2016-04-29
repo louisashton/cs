@@ -1,5 +1,6 @@
 package com.louis;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -8,16 +9,11 @@ import org.junit.BeforeClass;
 import java.util.ArrayList;
 import org.junit.rules.ExpectedException;
 import org.junit.Rule;
-import static org.junit.Assert.assertEquals;
-
 
 /**
- * Tests my HashTable implementation.
- * 
- * Uses JUnit over the lifecycle of two hashtables.
+ * Tests for {@link HashTable}.
  * 
  * @author Louis Ashton  (louisashton@live.com)
- *
  */
 public class HashTableTest {
     
@@ -27,30 +23,6 @@ public class HashTableTest {
     HashTable<ArrayList<Integer>, Integer> listIntegerTable = new HashTable<>();
     HashTable<String, ArrayList<String>> stringListTable = new HashTable<>();
     
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {}
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {}
-
     /**
      * Tests construction of hashtables.
      * 
