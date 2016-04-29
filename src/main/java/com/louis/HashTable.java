@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.reflect.Array;
+import org.immutables.value.Value;
+import com.louis.HashEntry;
+import java.lang.String;
 
 /**
  * Implements a hashtable.
@@ -15,210 +18,169 @@ import java.lang.reflect.Array;
  *
  * @author Louis Ashton (louisashton@live.com)
  */
-public class HashTable<K, V> {
+public class HashTable {
 
-    private static final int MIN_CAPACITY = 32;
-    private static final double RESIZE_LOAD = 0.5;
-    private static final double MAX_LOAD = 0.75;
-    private static final double MIN_LOAD = 0.25;
+	private static final int MIN_CAPACITY = 32;
+	private static final double RESIZE_LOAD = 0.5;
+	private static final double MAX_LOAD = 0.75;
+	private static final double MIN_LOAD = 0.25;
 
-    private HashEntry[] table;
-    private int currentSize;
-    private int currentCapacity;
+	private HashEntry[] table;
+	private int currentSize;
+	private int currentCapacity;
+	
+	/**
+	 * Creates a new HashTable.
+	 */
+	@SuppressWarnings("unchecked")
+	public HashTable() {
+		currentSize = 0;
+		currentCapacity = MIN_CAPACITY;
+		table = new HashEntry[currentCapacity];
+	}
 
-    /**
-     * Creates a new HashTable.
-     */
-    @SuppressWarnings("unchecked")
-    public HashTable() {
-        currentSize = 0;
-        currentCapacity = MIN_CAPACITY;
-        table = (HashEntry[]) Array.newInstance(HashEntry.class, currentCapacity);
-    }
 
-    /**
-     * Defines a HashTable entry.
-     * 
-     * Each entry consists of a key and an associated value. Both can be retrieved.
-     */
-    private class HashEntry {
+	/**
+	 * Returns the value associated with a key.
+	 *
+	 * @param key The key for which to look up the value.
+	 * @return The value associated with the key or null if no such value.
+	 * @throws IllegalArgumentException if key is null.
+	 */
+	public synchronized String get(String key) {
+		Preconditions.checkArgument(key != null, "first argument to get(String key) is null");
+		// Finds the key.
+		int index = hash(key) % currentCapacity;
+		while (!key.equals(table[index].getKey())) {
+			index = (index + 1) % currentCapacity;
+		}
+		return table[index] != null ? table[index].getValue() : null;
+	}
 
-        private final K key;
-        private final V value;
+	/**
+	 * Adds a key and its value to the table.
+	 *
+	 * @param key is the key to be added.
+	 * @param value is the value for this key.
+	 * @throws IllegalArgumentException if key or value is null.
+	 */
+	public synchronized void put(String key, String value) {
+		Preconditions.checkArgument(key != null, "first argument to put(String key, ...) is null");
+		int index = hash(key) % currentCapacity;
+		Preconditions.checkArgument(value != null, "second argument to put(..., String value) is null");
+		while (table[index] != null && !key.equals(table[index].getKey())) {
+			index = (index + 1) % currentCapacity;
+		}
 
-        /**
-         * Creates a new HashEntry.
-         */
-        HashEntry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
+		// Increases the size if a new key is being put in.
+		if (table[index] == null) {
+			currentSize++;
+		}
+		table[index] = ImmutableHashEntry.builder().key(key).value(value).build();
 
-        /**
-         * Returns the key.
-         * 
-         * @return Returns the entries' key.
-         */
-        public K getKey() {
-            return key;
-        }
+		resizeIfRequired();
+	}
 
-        /**
-         * Returns the value.
-         * @return Returns the entries' value.
-         */
-        public V getValue() {
-            return value;
-        }
-    }
+	/**
+	 * Hashs a key.
+	 *
+	 * The location of the key in the table is equivalent to this.
+	 * 
+	 * @param key is the key to be hashed.
+	 * @return Returns the hash of the key.
+	 */
+	private int hash(String key) {
+		int hashValue = key.hashCode();
+		hashValue ^= (hashValue >>> 20) ^ (hashValue >>> 12);
+		hashValue = hashValue ^ (hashValue >>> 7) ^ (hashValue >>> 4);
+		return Math.abs(hashValue);
+	}
 
-    /**
-     * Returns the value associated with a key.
-     *
-     * @param key The key for which to look up the value.
-     * @return The value associated with the key or null if no such value.
-     * @throws IllegalArgumentException if key is null.
-     */
-    public synchronized V get(K key) {
-        Preconditions.checkArgument(key != null, "first argument to get(K key) is null");
-        // Finds the key.
-        int index = hash(key) % currentCapacity;
-        while (!key.equals(table[index].getKey())) {
-            index = (index + 1) % currentCapacity;
-        }
-        return table[index] != null ? table[index].getValue() : null;
-    }
+	/**
+	 * Resizes the underlying array if required.
+	 */
+	private void resizeIfRequired() {
+		if (!((currentSize < currentCapacity * MIN_LOAD && currentCapacity > MIN_CAPACITY)
+				|| currentSize > currentCapacity * MAX_LOAD)) {
+			return;
+		}
+		int newCapacity = (int) (currentSize / RESIZE_LOAD);
 
-    /**
-     * Adds a key and its value to the table.
-     *
-     * @param key is the key to be added.
-     * @param value is the value for this key.
-     * @throws IllegalArgumentException if key or value is null.
-     */
-    public synchronized void put(K key, V value) {
-        Preconditions.checkArgument(key != null, "first argument to put(K key, ...) is null");
-        int index = hash(key) % currentCapacity;
-        Preconditions.checkArgument(value != null, "second argument to put(..., V Value) is null");
-        while (table[index] != null && !key.equals(table[index].getKey())) {
-            index = (index + 1) % currentCapacity;
-        }
+		@SuppressWarnings("unchecked")
+		// Makes the new array.
+		HashEntry[] newArray = new HashEntry[newCapacity];
 
-        // Increases the size if a new key is being put in.
-        if (table[index] == null) {
-            currentSize++;
-        }
-        table[index] = new HashEntry(key, value);
+		for (int oldIndex = 0; oldIndex < currentCapacity; oldIndex++) {
+			HashEntry oldEntry = table[oldIndex];
+			if (oldEntry == null) {
+				continue;
+			}
+			int index = hash(oldEntry.getKey()) % newCapacity;
+			while (newArray[index] != null && !oldEntry.getKey().equals(newArray[index].getKey())) {
+				// Gets the next index.
+				index = (index + 1) % newCapacity;
+			}
+			newArray[index] = oldEntry;
+		}
+		table = newArray;
+		currentCapacity = newCapacity;
+	}
 
-        resizeIfRequired();
-    }
+	/**
+	 * Gets the size of the table.
+	 * 
+	 * @return Returns the number of pairs in the table.
+	 */
+	public int size() {
+		return currentSize;
+	}
 
-    /**
-     * Hashs a key.
-     *
-     * The location of the key in the table is equivalent to this.
-     * 
-     * @param key is the key to be hashed.
-     * @return Returns the hash of the key.
-     */
-    private int hash(K key) {
-        int hashValue = key.hashCode();
-        hashValue ^= (hashValue >>> 20) ^ (hashValue >>> 12);
-        hashValue = hashValue ^ (hashValue >>> 7) ^ (hashValue >>> 4);
-        return Math.abs(hashValue);
-    }
+	/**
+	 * Returns all the keys in the hashtable.
+	 * 
+	 * @return Returns the set of all keys.
+	 */
+	public Set<String> getAll() {
+		Set<String> keys = new HashSet<String>(currentSize);
+		for (HashEntry entry : table) {
+			if (entry != null) {
+				keys.add(entry.getKey());
+			}
+		}
+		return keys;
+	}
 
-    /**
-     * Resizes the underlying array if required.
-     */
-    private void resizeIfRequired() {
-        if (!((currentSize < currentCapacity * MIN_LOAD && currentCapacity > MIN_CAPACITY)
-                || currentSize > currentCapacity * MAX_LOAD)) {
-            return;
-        }
-        int newCapacity = (int) (currentSize / RESIZE_LOAD);
+	/**
+	 * Removes the key from the hashtable.
+	 * 
+	 * @param key is the key to be deleted.
+	 * @throws IllegalArgumentException is thrown if key is null.
+	 */
+	public void delete(String key) {
+		Preconditions.checkArgument(key != null, "first argument to delete(String key) is null");
+		List<HashEntry> entries = new ArrayList<HashEntry>();
 
-        @SuppressWarnings("unchecked")
-        // Makes the new array.
-        HashEntry[] newArray = (HashEntry[]) Array.newInstance(HashEntry.class, newCapacity);
-        //HashEntry[] newArray = new HashEntry[newCapacity];
+		// Locates the key.
+		int index = hash(key) % currentCapacity;
+		while (table[index] != null && !key.equals(table[index].getKey())) {
+			index = (index + 1) % currentCapacity;
+			if (table[index] == null) System.out.printf("Key %s already deleted %n", key.toString());
+		}
 
-        for (int oldIndex = 0; oldIndex < currentCapacity; oldIndex++) {
-            HashEntry oldEntry = table[oldIndex];
-            if (oldEntry == null) {
-                continue;
-            }
-            int index = hash(oldEntry.getKey()) % newCapacity;
-            while (newArray[index] != null && !oldEntry.getKey().equals(newArray[index].getKey())) {
-                // Gets the next index.
-                index = (index + 1) % newCapacity;
-            }
-            newArray[index] = oldEntry;
-        }
-        table = newArray;
-        currentCapacity = newCapacity;
-    }
+		// Extracts keys that collided with this key.
+		while (table[index] != null) {
+			entries.add(table[index]);
+			table[index] = null;
+			currentSize--;
+			index = (index + 1) % currentCapacity;
+		}
 
-    /**
-     * Gets the size of the table.
-     * 
-     * @return Returns the number of pairs in the table.
-     */
-    public int size() {
-        return currentSize;
-    }
+		// Ignore the key to be deleted.
+		entries.remove(0);
 
-    /**
-     * Returns all the keys in the hashtable.
-     * 
-     * @return Returns the set of all keys.
-     */
-    public Set<K> getAll() {
-        Set<K> keys = new HashSet<K>(currentSize);
-        for (HashEntry entry : table) {
-            if (entry != null) {
-                keys.add(entry.getKey());
-            }
-        }
-        return keys;
-    }
-
-    /**
-     * Removes the key from the hashtable.
-     * 
-     * @param key is the key to be deleted.
-     * @throws IllegalArgumentException is thrown if key is null.
-     */
-    public void delete(K key) {
-        Preconditions.checkArgument(key != null, "first argument to delete(K key) is null");
-        List<HashEntry> entries = new ArrayList<HashEntry>();
-
-        // Locates the key.
-        int index = hash(key) % currentCapacity;
-        while (table[index] != null && !key.equals(table[index].getKey())) {
-            index = (index + 1) % currentCapacity;
-            if (table[index] == null) System.out.printf("Key %s already deleted %n", key.toString());
-        }
-
-        // Extracts keys that collided with this key.
-        while (table[index] != null) {
-            entries.add(table[index]);
-            table[index] = null;
-            currentSize--;
-            index = (index + 1) % currentCapacity;
-        }
-
-        // Ignore the key to be deleted.
-        entries.remove(0);
-
-        for (HashEntry entry : entries) {
-            // Puts the rest back in the hashtable, so that the linear probe is maintained.
-            this.put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Hashtable(%f, %f, %f)", MAX_LOAD, MIN_LOAD, RESIZE_LOAD);
-    }
+		for (HashEntry entry : entries) {
+			// Puts the rest back in the hashtable, so that the linear probe is maintained.
+			this.put(entry.getKey(), entry.getValue());
+		}
+	}
 }

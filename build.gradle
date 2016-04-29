@@ -1,3 +1,6 @@
+plugins {
+  id "net.ltgt.apt" version "0.6"
+}
 apply plugin: "java"
 apply plugin: "eclipse"
 
@@ -12,6 +15,9 @@ dependencies {
     compile group: "commons-collections", name: "commons-collections", version: commonsCollectionsVersion
     compile group: "com.google.guava", name: "guava", version: guavaVersion
     compile group: "com.google.googlejavaformat", name: "google-java-format", version: googleJavaFormatVersion
-    
+
+    apt "org.immutables:value:2.1.18"
+    compileOnly "org.immutables:value:2.1.18:annotations"
+
     testCompile group: "junit", name: "junit", version: junitVersion
 }
