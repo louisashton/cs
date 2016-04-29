@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.louis;
 
 import static org.junit.Assert.*;
@@ -18,48 +15,15 @@ import org.junit.Rule;
 /**
  * Tests my BinarySearchTree implementation.
  * 
- * Uses JUnit over the lifespan of a BST.
- * 
  * @author Louis Ashton (louisashton@live.com)
- *
  */
 public class BinarySearchTreeTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
     
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {}
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {}
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {}
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {}
-
-    /**
-     * Tests the BST.
-     * 
-     * Checks whether an element can be added and removed from the BST.
-     * Checks the important contains function.
-     */
     @Test
-    public void test() {
+    public void canAddSearchAndDelete() {
         BinarySearchTree<Integer,Integer> bst = new BinarySearchTree<>();
         bst.put(1,2);
         assertEquals(true, bst.contains(1));
@@ -72,5 +36,4 @@ public class BinarySearchTreeTest {
         exception.expect(NoSuchElementException.class);
         bst.deleteMin();
     }
-
 }

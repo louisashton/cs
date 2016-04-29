@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.louis;
 
 import java.util.NoSuchElementException;
@@ -9,10 +6,9 @@ import com.google.common.base.Preconditions;
 /**
  *  A binary search tree implementation.
  *  
- *  Binary search trees are derived from the associative array abstract data type.
- *  It is a symbol table with keys and values; null is excluded.
- *  The tree is not balanced. Keys are Comparable and the tree is sorted by them.
- *  Most operations have linear worst case complexity.
+ *  Binary search trees are derived from the associative array abstract data type. It is a symbol table with keys and 
+ *  values; null is excluded. The tree is not balanced. Keys are Comparable and the tree is sorted by them. Most 
+ *  operations have linear worst case complexity.
  *  
  *  @author Louis Ashton (louisashton@live.com)
  */
@@ -42,6 +38,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Gets the size of the BST.
+     * 
      * @return Returns the number of pairs in the BST.
      */
     public int size() {
@@ -50,6 +47,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Gets the size of a subtree.
+     * 
      * @param node is the root of the subtree.
      * @return Returns the number of pairs descendant from a node.
      */
@@ -66,7 +64,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      *
      * @param key is the key.
      * @return true if key is in the BST.
-     * @throws IllegalArgumentException is thrown if key is null.
+     * @throws IllegalArgumentException if key is null.
      */
     public boolean contains(Key key) {
         Preconditions.checkArgument(key != null, "first argument to contains(Key key) is null");
@@ -78,7 +76,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      *
      * @param key is the key.
      * @return Returns the value of the key if it is in the BST; null otherwise.
-     * @throws IllegalArgumentException is thrown if key is null.
+     * @throws IllegalArgumentException if key is null.
      */
     public Value get(Key key) {
         Preconditions.checkArgument(key != null, "First argument to get(Key key) is null.");
@@ -111,7 +109,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      * 
      * @param key is the key.
      * @param val is the value.
-     * @throws IllegalArgumentException is thrown if key is null.
+     * @throws IllegalArgumentException if key is null.
      */
     public void put(Key key, Value value) {
         Preconditions.checkArgument(key != null, "First argument to put(Key key, Value value) is null.");
@@ -150,7 +148,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      * Removes a key from the BST.
      * 
      * @param key is the key.
-     * @throws IllegalArgumentException is thrown if key is null.
+     * @throws IllegalArgumentException if key is null.
      */
     public void delete(Key key) {
         Preconditions.checkArgument(key != null, "First argument to delete(Key key) is null.");
