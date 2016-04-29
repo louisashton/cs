@@ -10,8 +10,7 @@ import java.lang.reflect.Array;
 /**
  * Implements a hashtable.
  *
- * Hashtables implement the associative array abstract data type.
- * The tables contain keys and associated values.
+ * Hashtables implement the associative array abstract data type. The tables contain keys and associated values.
  * A hash function computes the location of a value for a given key.
  *
  * @author Louis Ashton (louisashton@live.com)
@@ -27,7 +26,6 @@ public class HashTable<K, V> {
     private int currentSize;
     private int currentCapacity;
 
-
     /**
      * Creates a new HashTable.
      */
@@ -40,7 +38,8 @@ public class HashTable<K, V> {
 
     /**
      * Defines a HashTable entry.
-     * Similar to java.util.AbstractMap.SimpleEntry.
+     * 
+     * Each entry consists of a key and an associated value. Both can be retrieved.
      */
     private class HashEntry {
 
@@ -57,6 +56,7 @@ public class HashTable<K, V> {
 
         /**
          * Returns the key.
+         * 
          * @return Returns the entries' key.
          */
         public K getKey() {
@@ -75,9 +75,9 @@ public class HashTable<K, V> {
     /**
      * Returns the value associated with a key.
      *
-     * @param key is the specified key.
-     * @return Returns the value associated with the key; null if no such value.
-     * @throws IllegalArgumentException is thrown if key is null.
+     * @param key The key for which to look up the value.
+     * @return The value associated with the key or null if no such value.
+     * @throws IllegalArgumentException if key is null.
      */
     public synchronized V get(K key) {
         Preconditions.checkArgument(key != null, "first argument to get(K key) is null");
@@ -94,7 +94,7 @@ public class HashTable<K, V> {
      *
      * @param key is the key to be added.
      * @param value is the value for this key.
-     * @throws IllegalArgumentException is thrown if key or value is null.
+     * @throws IllegalArgumentException if key or value is null.
      */
     public synchronized void put(K key, V value) {
         Preconditions.checkArgument(key != null, "first argument to put(K key, ...) is null");
@@ -116,6 +116,8 @@ public class HashTable<K, V> {
     /**
      * Hashs a key.
      *
+     * The location of the key in the table is equivalent to this.
+     * 
      * @param key is the key to be hashed.
      * @return Returns the hash of the key.
      */
@@ -127,7 +129,7 @@ public class HashTable<K, V> {
     }
 
     /**
-     * Resizes the array when required.
+     * Resizes the underlying array if required.
      */
     private void resizeIfRequired() {
         if (!((currentSize < currentCapacity * MIN_LOAD && currentCapacity > MIN_CAPACITY)
@@ -137,7 +139,7 @@ public class HashTable<K, V> {
         int newCapacity = (int) (currentSize / RESIZE_LOAD);
 
         @SuppressWarnings("unchecked")
-        // Makes the new array
+        // Makes the new array.
         HashEntry[] newArray = (HashEntry[]) Array.newInstance(HashEntry.class, newCapacity);
         //HashEntry[] newArray = new HashEntry[newCapacity];
 
@@ -159,6 +161,7 @@ public class HashTable<K, V> {
 
     /**
      * Gets the size of the table.
+     * 
      * @return Returns the number of pairs in the table.
      */
     public int size() {
@@ -167,6 +170,7 @@ public class HashTable<K, V> {
 
     /**
      * Returns all the keys in the hashtable.
+     * 
      * @return Returns the set of all keys.
      */
     public Set<K> getAll() {
@@ -181,6 +185,7 @@ public class HashTable<K, V> {
 
     /**
      * Removes the key from the hashtable.
+     * 
      * @param key is the key to be deleted.
      * @throws IllegalArgumentException is thrown if key is null.
      */
