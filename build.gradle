@@ -16,7 +16,8 @@ dependencies {
     compile group: "com.google.guava", name: "guava", version: guavaVersion
     compile group: "com.google.googlejavaformat", name: "google-java-format", version: googleJavaFormatVersion
 
-    apt "org.immutables:value:2.1.18"
+    apt group: "org.immutables", name: "value", version: valueVersion
+
     compileOnly "org.immutables:value:2.1.18:annotations"
 
     testCompile group: "junit", name: "junit", version: junitVersion
