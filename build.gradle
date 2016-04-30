@@ -18,7 +18,7 @@ dependencies {
 
     apt group: "org.immutables", name: "value", version: valueVersion
 
-    compileOnly group: "org.immutables", name: "value", version: "2.1.18:annotations"
+    compileOnly group: "org.immutables", name: "value", version: valueVersion, classifier: "annotations"
 
     testCompile group: "junit", name: "junit", version: junitVersion
 }
