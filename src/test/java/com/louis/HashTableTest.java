@@ -20,8 +20,8 @@ public class HashTableTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
     
-    HashTable<ArrayList<Integer>, Integer> listIntegerTable = new HashTable<>();
-    HashTable<String, ArrayList<String>> stringListTable = new HashTable<>();
+    HashTable listIntegerTable = new HashTable();
+    HashTable stringListTable = new HashTable();
     
     /**
      * Tests construction of hashtables.
@@ -57,13 +57,9 @@ public class HashTableTest {
     @Test
     public void canPutEntries() {
         for (int i = 0; i < 1000; i++) {
-            ArrayList<Integer> integerList = new ArrayList<>();
-            ArrayList<String> stringList = new ArrayList<>();
-            stringList.add(Integer.toString(i));
-            integerList.add(i);
-            stringListTable.put(Integer.toString(i), stringList);
+            stringListTable.put(Integer.toString(i), Integer.toString(i));
             assertEquals(i + 1, stringListTable.size());
-            listIntegerTable.put(integerList, i);
+            listIntegerTable.put(Integer.toString(i), Integer.toString(i));
             assertEquals(i + 1, listIntegerTable.size());
         }
     }
@@ -77,14 +73,10 @@ public class HashTableTest {
     @Test
     public void canGetEntries() {
         for (int i = 0; i < 1000; i++) {
-            ArrayList<Integer> integerList = new ArrayList<>();
-            ArrayList<String> stringList = new ArrayList<>();
-            stringList.add(Integer.toString(i));
-            integerList.add(i);
-            stringListTable.put(Integer.toString(i), stringList);
-            listIntegerTable.put(integerList, i);
-            assertEquals(stringList, stringListTable.get(Integer.toString(i)));
-            assertEquals(Integer.valueOf(i), listIntegerTable.get(integerList));
+            stringListTable.put(Integer.toString(i), Integer.toString(i));
+            listIntegerTable.put(Integer.toString(i), Integer.toString(i));
+            assertEquals(Integer.toString(i), stringListTable.get(Integer.toString(i)));
+            assertEquals(Integer.toString(i), listIntegerTable.get(Integer.toString(i)));
         }
     }
 }
