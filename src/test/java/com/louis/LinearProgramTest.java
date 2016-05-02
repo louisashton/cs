@@ -12,6 +12,16 @@ import com.louis.LinearProgram;
 public class LinearProgramTest {
 	private static final double TOL = 1E-6;
 
+	/*
+	 * Solves a system of linear equations.
+	 * 
+	 * @param m is the number of constraints.
+	 * @param n is the number of variables.
+	 * @param c is the vector of cost variable coefficients.
+	 * @param a is the matrix of constraint variable coefficients.
+	 * @param b is the constant rhs vector.
+	 * @return the results of the program.
+	 */
 	public Output fullrsm(int m, int n, double[] c, double[][] a, double[] b){
 		LinearProgram lp = new LinearProgram(n,m);
 		lp.chooseCosts(c);
@@ -20,9 +30,11 @@ public class LinearProgramTest {
 		}
 		lp.preparation(n,m);
 		int SolveStatus = lp.Continue;
+		// Solves phase one.
 		while (SolveStatus == lp.Continue){
 			SolveStatus = lp.iterate();
 		}
+		//Solves phase two if possible.
 		if (lp.ArtificialAdded == true && SolveStatus != lp.Unbounded) {
 			if (lp.calculateObjective() <= 0) {
 				lp.eliminateArtificialVariables();
@@ -34,7 +46,6 @@ public class LinearProgramTest {
 				SolveStatus = lp.Infeasible;
 			}
 		}
-		lp.showInfo();
 		int result = SolveStatus;
 		double z = lp.calculateObjective();
 		double[] x = lp.x;
@@ -42,11 +53,18 @@ public class LinearProgramTest {
 		return new Output(result,z,x,pi);
 	}
 	
+	/*
+	 * The output specified in the brief of the assignment.
+	 */
 	private class Output {
 		int result;
 		double z;
 		double[] x;
 		double[] pi;
+		
+		/*
+		 * Constructs the output.
+		 */
 		private Output(int result, double z, double[] x, double[] pi){
 			this.result = result;
 			this.z = z;
@@ -102,6 +120,7 @@ public class LinearProgramTest {
 		assertEquals(1,output.result);
 		assertEquals((double)-136,output.z, TOL);
 	}
+	
 	@Test
 	public void testFive() {
 		int n = 7;
@@ -161,6 +180,7 @@ public class LinearProgramTest {
 		assertEquals(1,output.result);
 		assertEquals((double)-130/7,output.z, TOL);
 	}
+	
 	@Test
 	public void testTen() {
 		int n = 5;
@@ -173,6 +193,7 @@ public class LinearProgramTest {
 		assertEquals(1,output.result);
 		assertEquals((double)32,output.z, TOL);
 	}
+	
 	@Test
 	public void testEleven() {
 		int n = 4;

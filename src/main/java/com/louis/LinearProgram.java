@@ -4,76 +4,121 @@ import java.awt.*;
 import java.lang.Math;
 
 /**
- * Solves a linear problem using the Two-Phase Simplex Method.
+ * A Two-Phase Simplex method solver.
+ * 
+ * The Two-Phase Revised Simplex method solves a system of linear equations, A *
+ * x = b. An equation in standard form is inputted from contorlling external
+ * code. Variable names were specified in the assignment.
  * 
  * Author: Louis Ashton (louisashton@live.com)
  */
 public class LinearProgram {
+	// Type of variable.
 	public final static int BasicType = 1;
 	public final static int NonBasicType = 2;
+	// Type of solution.
 	public final static int Unbounded = -1;
 	public final static int Infeasible = 0;
 	public final static int Optimal = 1;
 	public final static int Continue = 2;
+	// Another classification of variables.
 	public final static int Regular = 0;
 	public final static int Artificial = 1;
+
+	// The number of variables, as specified in the brief.
 	public int n;
+	// The number of constraints, as specified in the brief.
 	public int m;
+	// The objective function, to be minimised.
 	public double[] cost;
+	// The solution vector.
 	public double[] x;
+	// The vector of duals.
 	public double[] pi;
+	// The leaving variable criterion.
 	public double[] BinvAs;
+	// The inverse of the basic constraint coefficients.
 	public Matrix Binv;
+	// The basic constraint coefficients.
 	public Matrix B;
+	// The basic objective coefficients (basic costs).
 	public double[] cB;
 	public double objectiveValue = 0;
+	// The constraint coefficients.
 	public double[][] A;
+	// The rhs of the constraints.
 	public double[] b;
+	// The basic variables.
 	public int[] basicvars;
+	// The entering variables.
 	public int s;
+	// The leaving variable.
 	public int r;
+	// The minimum ratio of the basic variables.
 	public double minratio;
+	// The number of non-basic variables.
 	public int numNonbasic;
+	// The number of constraints added to-date.
 	public int constraintsAdded = 0;
+	// The progress of one iteration.
 	public int Progress = 0;
 	public int numberOfIterations = 0;
 	public int numberOfArtificialVariables;
 	private int i, j, k, l;
+	// The reduced costs of the non-basic variables.
 	public double[] reducedCost;
+	// The number of basic variables which posses the minimum ratio.
 	public int numberOfMinRatioVariables;
 	public int[] Nonbasicvars;
 	public int[] varType;
-	public double[] columnInA;
+	public double[] nonBasicCosts;
+	// A permutation of vaiables that forms a full basis.
 	int[] getAPerm;
 	boolean ArtificialAdded = false;
+	// The costs originally inputted.
 	double OriginalCost[];
 
-	public LinearProgram(int numvar, int numcol) {
+	/*
+	 * Constructs a linear program.
+	 * 
+	 * @param numvar is the number of variables.
+	 * 
+	 * @param numcon is the number of constraints.
+	 */
+	public LinearProgram(int numvar, int numcon) {
 		n = numvar;
-		m = numcol;
-		cost = new double[numvar + 2 * numcol];
-		OriginalCost = new double[numvar + 2 * numcol];
-		x = new double[numcol];
-		pi = new double[numcol];
-		BinvAs = new double[numcol];
-		cB = new double[numcol];
-		A = new double[numcol][numvar + 3 * numcol];
-		b = new double[numcol];
-		basicvars = new int[numcol];
-		Binv = new Matrix(numcol);
-		B = new Matrix(numcol);
+		m = numcon;
+		cost = new double[numvar + 2 * numcon];
+		OriginalCost = new double[numvar + 2 * numcon];
+		x = new double[numcon];
+		pi = new double[numcon];
+		BinvAs = new double[numcon];
+		cB = new double[numcon];
+		A = new double[numcon][numvar + 3 * numcon];
+		b = new double[numcon];
+		basicvars = new int[numcon];
+		Binv = new Matrix(numcon);
+		B = new Matrix(numcon);
 		numberOfArtificialVariables = 0;
-		reducedCost = new double[numvar + 2 * numcol];
-		Nonbasicvars = new int[numvar + 2 * numcol];
-		varType = new int[numvar + 2 * numcol];
-		columnInA = new double[numcol];
+		reducedCost = new double[numvar + 2 * numcon];
+		Nonbasicvars = new int[numvar + 2 * numcon];
+		varType = new int[numvar + 2 * numcon];
+		nonBasicCosts = new double[numcon];
 	}
 
+	/*
+	 * A matrix over which Gauss-Jordanian elimination can be performed.
+	 */
 	private class Matrix {
 		public double A[][];
 		private int size;
 		private double[] temporary;
 
+		/*
+		 * Constructs a square matrix of the given size.
+		 * 
+		 * @param size is both the height and length of the array.
+		 */
 		public Matrix(int size) {
 			A = new double[size][size];
 			temporary = new double[size];
@@ -90,11 +135,9 @@ public class LinearProgram {
 			double scale, temporary;
 
 			// Forward elimination.
-
 			for (column = 0; column < size - 1; column++) {
 
-				/* Finds the maximum element in column column. */
-
+				// Finds the maximum element in the given column.
 				max = Math.abs(A[column][column]);
 				swap = column;
 				for (i = column + 1; i < size; i++)
@@ -104,7 +147,6 @@ public class LinearProgram {
 					}
 
 				// Exchanges rows "swap" and "column".
-
 				if (swap != column) {
 					temporary = b[swap];
 					b[swap] = b[column];
@@ -117,7 +159,6 @@ public class LinearProgram {
 				}
 
 				// Adds multiples of the pivot row to each row.
-
 				if (A[column][column] != 0)
 					for (row = column + 1; row < size; row++) {
 						scale = A[row][column] / A[column][column];
@@ -128,21 +169,27 @@ public class LinearProgram {
 					}
 			}
 
-			// Backwards substitution
-
+			// Backwards substitution.
 			for (column = size - 1; column >= 0; column--) {
 
 				x[column] = b[column];
-				for (row = size - 1; row > column; row--)
+				for (row = size - 1; row > column; row--) {
 					x[column] -= (x[row] * A[column][row]);
+				}
 
-				if (A[column][column] != 0)
+				if (A[column][column] != 0) {
 					x[column] /= A[column][column];
+				}
 			}
 			return true;
 		}
 	}
 
+	/*
+	 * One iteration of the method.
+	 * 
+	 * @return the status of the program.
+	 */
 	public int iterate() {
 
 		numberOfIterations++;
@@ -158,36 +205,51 @@ public class LinearProgram {
 		}
 		this.makeB();
 
-		for (int i = 0; i < m; i++)
-			columnInA[i] = A[i][Nonbasicvars[s]];
-
-		B.GJ(BinvAs, columnInA);
+		for (int i = 0; i < m; i++) {
+			nonBasicCosts[i] = A[i][Nonbasicvars[s]];
+		}
+		B.GJ(BinvAs, nonBasicCosts);
 
 		if (!this.testUnboundedness()) {
 			this.fullfindLV();
-			this.GJupdate();
+			this.gaussJordanianUpdate();
 
 			return Continue;
-		} else
+		} else {
 			return Unbounded;
+		}
 	}
 
+	/*
+	 * Updates the inverse for the constraint coefficients of the basic
+	 * variables.
+	 */
 	private void makeBinv() {
 		for (i = 0; i < m; i++) {
 			cB[i] = cost[basicvars[i]];
-			for (j = 0; j < m; j++)
+			for (j = 0; j < m; j++) {
 				Binv.A[i][j] = A[j][basicvars[i]];
+			}
 		}
 	}
 
+	/*
+	 * Calculates the reduced cost of each non-basic variable.
+	 */
 	public void calculateReducedCosts() {
 		for (i = 0; i < numNonbasic; i++) {
-			for (j = 0; j < m; j++)
-				columnInA[j] = A[j][Nonbasicvars[i]];
-			reducedCost[i] = cost[Nonbasicvars[i]] - this.dotProduct(pi, columnInA, m);
+			for (j = 0; j < m; j++) {
+				nonBasicCosts[j] = A[j][Nonbasicvars[i]];
+			}
+			reducedCost[i] = cost[Nonbasicvars[i]] - this.dotProduct(pi, nonBasicCosts, m);
 		}
 	}
 
+	/*
+	 * The solution is optimal if all reduced costs are positive.
+	 * 
+	 * @return whether the solution is optimal.
+	 */
 	public boolean testForOptimality() {
 		boolean isOptimal = true;
 		for (int i = 0; i < numNonbasic; i++)
@@ -198,6 +260,9 @@ public class LinearProgram {
 		return isOptimal;
 	}
 
+	/*
+	 * The entering variable minimises the reduced costs of entering.
+	 */
 	public void fullfindEV() {
 		int minimumIndex = 0;
 		double minValue = 100000;
@@ -209,19 +274,33 @@ public class LinearProgram {
 		s = minimumIndex;
 	}
 
+	/*
+	 * The total cost is equal to the coefficients of the basic variables
+	 * multiplied by their values.
+	 * 
+	 * @return the value of the objective.
+	 */
 	public double calculateObjective() {
 		double z = 0;
-		for (int i = 0; i < m; i++)
+		for (int i = 0; i < m; i++) {
 			z += (x[i] * cost[basicvars[i]]);
+		}
 		return z;
 	}
 
+	/*
+	 * Updates the constraint coefficients of the basic variables.
+	 */
 	private void makeB() {
 		for (i = 0; i < m; i++)
-			for (j = 0; j < m; j++)
+			for (j = 0; j < m; j++) {
 				B.A[i][j] = A[i][basicvars[j]];
+			}
 	}
 
+	/*
+	 * The leaving variables minimises all positive shadow prices.
+	 */
 	public void fullfindLV() {
 		double Ratio;
 		int minimumIndex = -1;
@@ -238,24 +317,31 @@ public class LinearProgram {
 					minratio = Ratio;
 					minimumIndex = i;
 					numberOfMinRatioVariables = 1;
-				} else if (Ratio == minratio)
+				} else if (Ratio == minratio) {
 					numberOfMinRatioVariables++;
+				}
 			}
 		}
 		r = minimumIndex;
 	}
 
-	public void GJupdate() {
+	/*
+	 * Updates the inverse and solution vector through Gauss-Jordan pivoting.
+	 */
+	public void gaussJordanianUpdate() {
 		int temporary;
 
-		for (i = 0; i < m; i++)
+		for (i = 0; i < m; i++) {
 			x[i] -= (minratio * BinvAs[i]);
+		}
 		x[r] = minratio;
 
-		if (varType[basicvars[r]] == Artificial)
+		if (varType[basicvars[r]] == Artificial) {
 			numberOfArtificialVariables--;
-		if (varType[Nonbasicvars[s]] == Artificial)
+		}
+		if (varType[Nonbasicvars[s]] == Artificial) {
 			numberOfArtificialVariables++;
+		}
 
 		temporary = basicvars[r];
 		basicvars[r] = Nonbasicvars[s];
@@ -264,22 +350,41 @@ public class LinearProgram {
 		this.makeBinv();
 	}
 
+	/*
+	 * The problem is unbounded if the leaving ratios are negative.
+	 * 
+	 * @return true if the problem is unbounded.
+	 */
 	public boolean testUnboundedness() {
 		boolean isUnbounded = true;
 		/* If BinvAs > 0 the problem is unbounded. */
-		for (i = 0; i < m; i++)
+		for (i = 0; i < m; i++) {
 			if (BinvAs[i] > 0) {
 				isUnbounded = false;
 				break;
 			}
+		}
 		return isUnbounded;
 	}
 
+	/*
+	 * Updates the objective coefficients.
+	 * 
+	 * @param coefficient is the costs to be added.
+	 */
 	public void chooseCosts(double[] coefficient) {
-		for (i = 0; i < n; i++)
+		for (i = 0; i < n; i++) {
 			cost[i] = coefficient[i];
+		}
 	}
 
+	/*
+	 * Adds a constraint to the program.
+	 * 
+	 * @param coefficients are the values of the lhs for each variable.
+	 * 
+	 * @param rhs is the right hand side constant of the equality.
+	 */
 	public void addConstraint(double[] coefficients, double rhs) {
 		for (i = 0; i < n; i++) {
 			A[constraintsAdded][i] = coefficients[i];
@@ -289,14 +394,24 @@ public class LinearProgram {
 		constraintsAdded++;
 	}
 
+	/*
+	 * Creates the first solution to the equations.
+	 * 
+	 * @param numberOfVariables is the length of the various arrays.
+	 * 
+	 * @param numberOfConstraints is the height of the constraint matix.
+	 * 
+	 * @return true if compelted without exception.
+	 */
 	public boolean preparation(int numberOfVariables, int numberOfConstraints) {
 		int lastColumn, NextNonBasic;
 		int[] ConstraintVariable = new int[numberOfConstraints];
 
 		lastColumn = numberOfVariables;
 
-		for (i = 0; i < lastColumn; i++)
+		for (i = 0; i < lastColumn; i++) {
 			Nonbasicvars[i] = i;
+		}
 
 		NextNonBasic = lastColumn;
 
@@ -321,73 +436,54 @@ public class LinearProgram {
 		numNonbasic = lastColumn - m;
 		n = lastColumn;
 
-		if (numberOfArtificialVariables > 0)
+		if (numberOfArtificialVariables > 0) {
 			this.createPhaseOne();
+		}
 
 		return true;
 	}
 
+	/*
+	 * Finalises the conditions for phase one.
+	 * 
+	 * Modifies the costs so that phase one can start.
+	 */
 	public void createPhaseOne() {
 		double phaseCosts[] = new double[n];
 
 		for (int i = 0; i < n; i++) {
 			OriginalCost[i] = cost[i];
-			if (Artificial == varType[i])
+			if (Artificial == varType[i]) {
 				phaseCosts[i] = 1;
-			else
+			} else {
 				phaseCosts[i] = 0;
+			}
 		}
 		this.chooseCosts(phaseCosts);
 	}
 
+	/*
+	 * Performs scalar multiplicatin of two vectors.
+	 * 
+	 * @param row is the first vector.
+	 * 
+	 * @param column is the second vector.
+	 * 
+	 * @param size is the minimum of the lengths of the two vectors.
+	 * 
+	 * @return the inner product of the two vectors.
+	 */
 	public double dotProduct(double[] row, double[] column, int size) {
 		double result = 0;
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < size; i++) {
 			result += row[i] * column[i];
+		}
 		return result;
 	}
 
-	public void showInfo() {
-		for (int j = 0; j < n; j++)
-			System.out.println("cost[" + j + "]:" + cost[j]);
-		for (int i = 0; i < m; i++)
-			for (int j = 0; j < n; j++)
-				System.out.println("A[" + i + "][" + j + "]:" + A[i][j]);
-
-		System.out.println("r:" + r);
-
-		System.out.println("s:" + s);
-
-		for (int i = 0; i < m; i++)
-			System.out.println("cB[" + i + "]:" + cB[i]);
-
-		System.out.println("minratio:" + minratio);
-
-		for (int i = 0; i < m; i++)
-			System.out.println("pi[" + i + "]:" + pi[i]);
-
-		for (int i = 0; i < m; i++)
-			System.out.println("BinvAs[" + i + "]:" + BinvAs[i]);
-
-		for (int i = 0; i < m; i++)
-			System.out.println("basicvars[" + i + "]:" + basicvars[i]);
-
-		for (int i = 0; i < numNonbasic; i++)
-			System.out.println("Nonbasicvars[" + i + "]:" + Nonbasicvars[i]);
-
-		for (int i = 0; i < m; i++)
-			System.out.println("x[" + i + "]:" + x[i]);
-
-		for (int i = 0; i < numNonbasic; i++)
-			System.out.println("reducedCost[" + i + "]:" + reducedCost[i]);
-
-		System.out.println("objectiveValue:" + objectiveValue);
-
-		for (int i = 0; i < n; i++)
-			System.out.println("OriginalCost[" + i + "]:" + OriginalCost[i]);
-
-	}
-
+	/*
+	 * Prepares the system for phase two.
+	 */
 	public void eliminateArtificialVariables() {
 		int i;
 		int LastBasic = 0;
@@ -397,8 +493,9 @@ public class LinearProgram {
 		int ArtificialsInBasis;
 		int[] BasisType = new int[n];
 
-		for (i = 0; i < numNonbasic; i++)
+		for (i = 0; i < numNonbasic; i++) {
 			BasisType[Nonbasicvars[i]] = NonBasicType;
+		}
 
 		for (i = 0; i < m; i++) {
 			BasisType[basicvars[i]] = BasicType;
@@ -411,41 +508,48 @@ public class LinearProgram {
 		 * eliminate them.
 		 */
 
-		for (i = 0; i < n; i++)
+		for (i = 0; i < n; i++) {
 			if (varType[i] != Artificial) {
 				switch (BasisType[i]) {
-				case BasicType:
+				case BasicType: {
 					basicvars[LastBasic] = i;
 					x[LastBasic] = temporaryXvalues[i];
 					LastBasic++;
 					break;
-				case NonBasicType:
+				}
+				case NonBasicType: {
 					Nonbasicvars[LastNonBasic] = i;
 					LastNonBasic++;
 					break;
+				}
 				default:
 				}
-			} else
+			} else {
 				artificialCount++;
+			}
+		}
 
 		ArtificialsInBasis = 0;
 
-		for (i = 0; i < n; i++)
+		for (i = 0; i < n; i++) {
 			if (varType[i] == Artificial) {
 				switch (BasisType[i]) {
-				case BasicType:
+				case BasicType: {
 					ArtificialsInBasis++;
 					basicvars[LastBasic] = i;
 					x[LastBasic] = temporaryXvalues[i];
 					LastBasic++;
 					break;
-				case NonBasicType:
+				}
+				case NonBasicType: {
 					Nonbasicvars[LastNonBasic] = i;
 					LastNonBasic++;
 					break;
+				}
 				default:
 				}
 			}
+		}
 
 		if (ArtificialsInBasis > 0) {
 			basisAugmentation(m - ArtificialsInBasis);
@@ -456,33 +560,38 @@ public class LinearProgram {
 				basicvars[i] = getAPerm[i];
 			}
 
-			for (i = 0; i < n; i++)
+			for (i = 0; i < n; i++) {
 				BasisType[i] = NonBasicType;
+			}
 
-			for (i = 0; i < m; i++)
+			for (i = 0; i < m; i++) {
 				BasisType[basicvars[i]] = BasicType;
+			}
 
 			LastBasic = 0;
 			LastNonBasic = 0;
 
-			for (i = 0; i < n; i++)
+			for (i = 0; i < n; i++) {
 				switch (BasisType[i]) {
-				case BasicType:
+				case BasicType: {
 					if (varType[i] == Artificial) {
 					}
 					basicvars[LastBasic] = i;
 					x[LastBasic] = temporaryXvalues[i];
 					LastBasic++;
 					break;
-				case NonBasicType:
+				}
+				case NonBasicType: {
 					Nonbasicvars[LastNonBasic] = i;
 					LastNonBasic++;
 					break;
+				}
 				default:
 				}
+			}
 		}
 
-		// Move to phase 2
+		// Move to phase two.
 		ArtificialAdded = false;
 
 		this.chooseCosts(OriginalCost);
@@ -491,10 +600,19 @@ public class LinearProgram {
 		n -= artificialCount;
 
 		Progress = 0;
-
 	}
 
-	//Augments a partial basis to give us the columns required for a full implmentation, by eliminating artifical variables.
+	/*
+	 * Creates a full basis.
+	 * 
+	 * Augments a partial basis to give us the columns required for a full
+	 * implmentation, by eliminating artifical variables.
+	 * 
+	 * @param sizeOfBasis is the output width of the basis (the number of basic
+	 * variables).
+	 * 
+	 * @return 0 if the basis if full, 1 if it is partial.
+	 */
 	public int basisAugmentation(int sizeOfBasis) {
 		int i, j, k, highI, lowI, temporaryI;
 		double[][] basicNormal;
@@ -535,14 +653,16 @@ public class LinearProgram {
 		lowI = 0;
 		highI = cols - 1;
 		for (i = 0; i < cols; i++) {
-			if (inbasis(i, sizeOfBasis, basicvars)) {
-				for (j = 0; j < rows; j++)
+			if (isInBasis(i, sizeOfBasis, basicvars)) {
+				for (j = 0; j < rows; j++) {
 					basicNormal[j][lowI] = A[j][i];
+				}
 				getAPerm[lowI] = i;
 				lowI++;
 			} else {
-				for (j = 0; j < rows; j++)
+				for (j = 0; j < rows; j++) {
 					basicNormal[j][highI] = A[j][i];
+				}
 				getAPerm[highI] = i;
 				highI--;
 			}
@@ -552,12 +672,14 @@ public class LinearProgram {
 		for (i = 0; i < sizeOfBasis; i++) {
 			// Finds the norm of the column.
 			normalEigen = 0;
-			for (j = i; j < rows; j++)
+			for (j = i; j < rows; j++) {
 				normalEigen += basicNormal[j][i] * basicNormal[j][i];
+			}
 			normalEigen = (double) Math.sqrt(normalEigen);
 
-			for (j = i; j < rows; j++)
+			for (j = i; j < rows; j++) {
 				vectorT[j] = basicNormal[j][i];
+			}
 
 			if (vectorT[i] < 0) {
 				basicNormal[i][i] = normalEigen;
@@ -568,22 +690,26 @@ public class LinearProgram {
 			}
 
 			// Zeroes the column.
-			for (j = i + 1; j < rows; j++)
+			for (j = i + 1; j < rows; j++) {
 				basicNormal[j][i] = 0;
+			}
 
 			eigenOne = 0;
-			for (j = i; j < rows; j++)
+			for (j = i; j < rows; j++) {
 				eigenOne += vectorT[j] * vectorT[j];
+			}
 
 			eigenOne = 2 / eigenOne;
 
 			for (k = i + 1; k < cols; k++) {
 				eigenTwo = 0;
-				for (j = i; j < rows; j++)
+				for (j = i; j < rows; j++) {
 					eigenTwo += vectorT[j] * basicNormal[j][k];
+				}
 				eigenTwo *= eigenOne;
-				for (j = i; j < rows; j++)
+				for (j = i; j < rows; j++) {
 					basicNormal[j][k] -= eigenTwo * vectorT[j];
+				}
 			}
 		}
 
@@ -619,13 +745,15 @@ public class LinearProgram {
 			if (i < rows - 1) {
 
 				normalEigen = 0;
-				for (j = i; j < rows; j++)
+				for (j = i; j < rows; j++) {
 					normalEigen += basicNormal[j][i] * basicNormal[j][i];
+				}
 
 				normalEigen = (double) Math.sqrt(normalEigen);
 
-				for (j = i; j < rows; j++)
+				for (j = i; j < rows; j++) {
 					vectorT[j] = basicNormal[j][i];
+				}
 
 				if (vectorT[i] < 0) {
 					basicNormal[i][i] = normalEigen;
@@ -635,33 +763,49 @@ public class LinearProgram {
 					vectorT[i] += normalEigen;
 				}
 
-				for (j = i + 1; j < rows; j++)
+				for (j = i + 1; j < rows; j++) {
 					basicNormal[j][i] = 0;
+				}
 
 				eigenOne = 0;
-				for (j = i; j < rows; j++)
+				for (j = i; j < rows; j++) {
 					eigenOne += vectorT[j] * vectorT[j];
+				}
 				eigenOne = 2 / eigenOne;
 
 				for (k = i + 1; k < cols; k++) {
 					eigenTwo = 0;
-					for (j = i; j < rows; j++)
+					for (j = i; j < rows; j++) {
 						eigenTwo += vectorT[j] * basicNormal[j][k];
+					}
 					eigenTwo *= eigenOne;
-					for (j = i; j < rows; j++)
+					for (j = i; j < rows; j++) {
 						basicNormal[j][k] -= eigenTwo * vectorT[j];
+					}
 				}
 			}
 		}
 
 		/*
-		 * The columns required for a full basis are elements sizeOfBasis to rows-1 of getAPerm.
+		 * The columns required for a full basis are elements sizeOfBasis to
+		 * rows-1 of getAPerm.
 		 */
 
 		return 0;
 	}
 
-	boolean inbasis(int i, int sizeOfBasis, int[] basis) {
+	/*
+	 * Searches a basis for a basic variable.
+	 * 
+	 * @param i is the variable.
+	 * 
+	 * @param sizeOfBasis si the length of the basis.
+	 * 
+	 * @param basis is a list of basic variables.
+	 * 
+	 * @return true if the variable is basic.
+	 */
+	boolean isInBasis(int i, int sizeOfBasis, int[] basis) {
 		int j;
 		for (j = 0; j < sizeOfBasis; j++) {
 			if (basis[j] == i)
