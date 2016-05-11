@@ -1,0 +1,17 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+
+sourceCompatibility = 1.8
+version = "1.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: "commons-collections", name: "commons-collections", version: commonsCollectionsVersion
+    compile group: "com.google.guava", name: "guava", version: guavaVersion
+    compile group: "com.google.googlejavaformat", name: "google-java-format", version: googleJavaFormatVersion
+    
+    testCompile group: "junit", name: "junit", version: junitVersion
+}
