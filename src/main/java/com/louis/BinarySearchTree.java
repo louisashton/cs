@@ -4,25 +4,34 @@ import java.util.NoSuchElementException;
 import com.google.common.base.Preconditions;
 
 /**
- *  A binary search tree implementation.
- *  
- *  Binary search trees are derived from the associative array abstract data type. It is a symbol table with keys and 
- *  values; null is excluded. The tree is not balanced. Keys are Comparable and the tree is sorted by them. Most 
- *  operations have linear worst case complexity.
- *  
- *  @author Louis Ashton (louisashton@live.com)
+ * A binary search tree implementation.
+ * 
+ * Binary search trees (BSTs) are derived from the associative array abstract data type. It is a
+ * symbol table with keys and values; null is excluded. The tree is not balanced. Keys are
+ * Comparable and the tree is sorted by them. Most operations have linear worst case complexity.
+ * 
+ * @author Louis Ashton (louisashton@live.com)
  */
 public class BinarySearchTree<Key extends Comparable<Key>, Value> {
-    // The root of the BST.
+
+    // The root of the binary search tree.
     private Node root;
 
+    /**
+     * A node of a binary search tree.
+     * 
+     * Each node has a key and associated value. Pointers to the node's children are also stored.
+     */
     private class Node {
         private Key key;
         private Value value;
         private Node leftSubtree;
         private Node rightSubtree;
-        private int sizeOfSubtree;             
+        private int sizeOfSubtree;
 
+        /**
+         * Creates a Node.
+         */
         public Node(Key key, Value value, int sizeOfSubtree) {
             this.key = key;
             this.value = value;
@@ -31,15 +40,12 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     }
 
     /**
-     * Creates a BST.
+     * Creates a binary search tree.
      */
-    public BinarySearchTree() {
-    }
+    public BinarySearchTree() {}
 
     /**
-     * Gets the size of the BST.
-     * 
-     * @return Returns the number of pairs in the BST.
+     * Returns the number of nodes in the binary search tree.
      */
     public int size() {
         return size(root);
@@ -60,10 +66,10 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     }
 
     /**
-     * Checks the BST for a key.
+     * Checks the binary search tree for a key.
      *
      * @param key is the key.
-     * @return true if key is in the BST.
+     * @return true if key is in the binary search tree.
      * @throws IllegalArgumentException if key is null.
      */
     public boolean contains(Key key) {
@@ -75,7 +81,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      * Gets a key's value.
      *
      * @param key is the key.
-     * @return Returns the value of the key if it is in the BST; null otherwise.
+     * @return Returns the value of the key if it is in the binary search tree; null otherwise.
      * @throws IllegalArgumentException if key is null.
      */
     public Value get(Key key) {
@@ -105,14 +111,15 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     }
 
     /**
-     * Adds a node to the BST.
+     * Adds a node to the binary search tree.
      * 
      * @param key is the key.
      * @param val is the value.
      * @throws IllegalArgumentException if key is null.
      */
     public void put(Key key, Value value) {
-        Preconditions.checkArgument(key != null, "First argument to put(Key key, Value value) is null.");
+        Preconditions.checkArgument(key != null,
+                "First argument to put(Key key, Value value) is null.");
         if (value == null) {
             delete(key);
             return;
@@ -134,7 +141,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
         }
         int cmp = key.compareTo(node.key);
         if (cmp < 0) {
-            node.leftSubtree = put(node.leftSubtree,  key, value);
+            node.leftSubtree = put(node.leftSubtree, key, value);
         } else if (cmp > 0) {
             node.rightSubtree = put(node.rightSubtree, key, value);
         } else {
@@ -145,7 +152,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     }
 
     /**
-     * Removes a key from the BST.
+     * Removes a key from the binary search tree.
      * 
      * @param key is the key.
      * @throws IllegalArgumentException if key is null.
@@ -168,23 +175,25 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
         }
         int cmp = key.compareTo(node.key);
         if (cmp < 0) {
-            node.leftSubtree  = delete(node.leftSubtree,  key);
+            node.leftSubtree = delete(node.leftSubtree, key);
         } else if (cmp > 0) {
             node.rightSubtree = delete(node.rightSubtree, key);
-        } else { 
-            if (node.rightSubtree == null) return node.leftSubtree;
-            if (node.leftSubtree  == null) return node.rightSubtree;
+        } else {
+            if (node.rightSubtree == null)
+                return node.leftSubtree;
+            if (node.leftSubtree == null)
+                return node.rightSubtree;
             Node topNode = node;
             node = min(topNode.rightSubtree);
             node.rightSubtree = deleteMin(topNode.rightSubtree);
             node.leftSubtree = topNode.leftSubtree;
-        } 
+        }
         node.sizeOfSubtree = size(node.leftSubtree) + size(node.rightSubtree) + 1;
         return node;
-    } 
+    }
 
     /**
-     * Deletes the BST's minimum.
+     * Deletes the binary search tree's minimum.
      *
      * @throws NoSuchElementException if the symbol table is empty
      */
@@ -212,17 +221,17 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     }
 
     /**
-     * Finds the minimum of the BST.
+     * Finds the minimum of the binary search tree.
      *
      * @return Returns the smallest key in the symbol table.
      * @throws NoSuchElementException if the symbol table is empty.
      */
     public Key min() {
         if (size() == 0) {
-            throw new NoSuchElementException("BST is empty.");
+            throw new NoSuchElementException("binary search tree is empty.");
         }
         return min(root).key;
-    } 
+    }
 
     /**
      * Finds the minimum of a subtree.
@@ -230,27 +239,26 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      * @param node is the root of the subtree.
      * @return Returns the smallest key in the subtree.
      */
-    private Node min(Node node) { 
+    private Node min(Node node) {
         if (node.leftSubtree == null) {
-            return node; 
+            return node;
+        } else {
+            return min(node.leftSubtree);
         }
-        else {
-            return min(node.leftSubtree); 
-        }
-    } 
+    }
 
     /**
-     * Finds the BST's maximum.
+     * Finds the binary search tree's maximum.
      *
      * @return Returns the largest key in the symbol table.
      * @throws NoSuchElementException if the symbol table is empty.
      */
     public Key max() {
         if (size() == 0) {
-            throw new NoSuchElementException("BST is empty.");
+            throw new NoSuchElementException("The binary search tree is empty.");
         }
         return max(root).key;
-    } 
+    }
 
     /**
      * Finds the maximum of a subtree.
@@ -260,10 +268,9 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      */
     private Node max(Node node) {
         if (node.rightSubtree == null) {
-            return node; 
+            return node;
+        } else {
+            return max(node.rightSubtree);
         }
-        else {
-            return max(node.rightSubtree); 
-        }
-    } 
+    }
 }
