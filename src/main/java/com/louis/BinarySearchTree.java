@@ -54,7 +54,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Gets the size of a subtree.
      * 
-     * @param node is the root of the subtree.
+     * @param node the node is the root of the subtree.
      * @return Returns the number of pairs descendant from a node.
      */
     private int size(Node node) {
@@ -68,7 +68,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Checks the binary search tree for a key.
      *
-     * @param key is the key.
+     * @param key the key that is to be found.
      * @return true if key is in the binary search tree.
      * @throws IllegalArgumentException if key is null.
      */
@@ -80,7 +80,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Gets a key's value.
      *
-     * @param key is the key.
+     * @param key the key whose value is sought.
      * @return Returns the value of the key if it is in the binary search tree; null otherwise.
      * @throws IllegalArgumentException if key is null.
      */
@@ -92,8 +92,8 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Gets a key's value.
      *
-     * @param node is the root of the subtree.
-     * @param key is the key.
+     * @param node node is the root of the subtree.
+     * @param key key is the key.
      * @return Returns the value of the key if it is in the subtree; null otherwise.
      */
     private Value get(Node node, Key key) {
@@ -113,8 +113,8 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Adds a node to the binary search tree.
      * 
-     * @param key is the key.
-     * @param val is the value.
+     * @param key the key to be added.
+     * @param value the value to be added.
      * @throws IllegalArgumentException if key is null.
      */
     public void put(Key key, Value value) {
@@ -130,9 +130,9 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Adds a pair to a subtree.
      * 
-     * @param node is the root of the subtree.
-     * @param key is the key.
-     * @param val is the value.
+     * @param node node is the root of the subtree.
+     * @param key key is the key.
+     * @param value value is the value.
      * @return Returns the updated root of the subtree.
      */
     private Node put(Node node, Key key, Value value) {
@@ -154,7 +154,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Removes a key from the binary search tree.
      * 
-     * @param key is the key.
+     * @param key the key to be deleted.
      * @throws IllegalArgumentException if key is null.
      */
     public void delete(Key key) {
@@ -165,8 +165,8 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Removes a key from a subtree.
      * 
-     * @param node is the root of the subtree.
-     * @param key is the key.
+     * @param node node is the root of the subtree.
+     * @param key key is the key.
      * @return Returns the updated root of the subtree.
      */
     private Node delete(Node node, Key key) {
@@ -207,7 +207,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Deletes a subtree's minimum.
      *
-     * @param node is the root of the subtree.
+     * @param node node is the root of the subtree.
      * @return Returns the updated root of the subtree.
      * @throws NoSuchElementException if the symbol table is empty
      */
@@ -236,7 +236,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Finds the minimum of a subtree.
      *
-     * @param node is the root of the subtree.
+     * @param node node is the root of the subtree.
      * @return Returns the smallest key in the subtree.
      */
     private Node min(Node node) {
@@ -263,7 +263,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
     /**
      * Finds the maximum of a subtree.
      *
-     * @param node is the root of the subtree.
+     * @param node node is the root of the subtree.
      * @return Returns the largest key in the subtree.
      */
     private Node max(Node node) {
