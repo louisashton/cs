@@ -74,7 +74,7 @@ public class LinkedList<Item> implements Iterable<Item> {
 	 */
 	public boolean contains(Item item) {
 		Preconditions.checkArgument(item != null, "First argument to contains(Item item) is null.");
-		for (Node x = first; x != first; x = x.next){
+		for (Node x = first; x != null; x = x.next){
 			if (item.equals(x.item)) {
 				return true;
 			}
@@ -90,14 +90,11 @@ public class LinkedList<Item> implements Iterable<Item> {
 	 */
 	public void remove(Item item) {
 		Preconditions.checkArgument(item != null, "First argument to remove(Item item) is null.");
-		if (item.equals(first.item)) {
-			first = first.next;
-			sizeOfList--;
-		}
 
-		for (Node x = first; x.next != first; x = x.next) {
+		for (Node x = first; x.next != null; x = x.next) {
 			if (item.equals(x.next.item)) {
 				x.next = x.next.next;
+                x.next.previous = x;
 				sizeOfList--;
 			}
 		}
