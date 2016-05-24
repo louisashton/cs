@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 import org.immutables.value.Value;
 import com.louis.HashEntry;
 import java.lang.String;
+import java.util.Optional;
 
 /**
  * Implements a hashtable.
@@ -39,6 +40,44 @@ public class HashTable {
 		table = new HashEntry[currentCapacity];
 	}
 
+	/**
+	 * Returns true if key is a member of this table.
+	 *
+	 * @param key the key to check for in the table. May not be null.
+	 * @return Returns true if the table contains that key.
+	 * @throws IllegalArgumentException if key is null.
+	 */
+	public boolean contains(String key) {
+		Preconditions.checkArgument(key != null,
+				"First argument to contains(String key) is null");
+		int index = calculateDesiredPositionOfKey(key);
+		return searchForKeyFromIndex(key, index).isPresent();
+	}
+
+	private int calculateDesiredPositionOfKey(String key) {
+		return hash(key) % currentCapacity;
+	}
+
+	private Optional<Integer> searchForKeyFromIndex(String key, int index) {
+		if (key.equals(table[index])) {
+			return Optional.of(index);
+		} else {
+			return searchForKeyForwardOfIndex(key, index + 1, index);
+		}
+	}
+
+	private Optional<Integer> searchForKeyForwardOfIndex(String key, int currentIndex,
+															 int finalIndex) {
+		if (key.equals(table[currentIndex])) {
+			return Optional.of(currentIndex);
+		} else {
+			if (currentIndex == finalIndex) {
+				return Optional.empty();
+			} else {
+				return searchForKeyForwardOfIndex(key, (currentIndex + 1 % currentCapacity), finalIndex);
+			}
+		}
+	}
 
 	/**
 	 * Returns the value associated with a key.
