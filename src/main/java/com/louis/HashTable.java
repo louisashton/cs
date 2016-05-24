@@ -33,11 +33,10 @@ public class HashTable {
 	/**
 	 * Creates a new HashTable.
 	 */
-	@SuppressWarnings("unchecked")
 	public HashTable() {
 		currentSize = 0;
 		currentCapacity = MIN_CAPACITY;
-		table = new HashEntry[currentCapacity];
+		table = new HashEntry[MIN_CAPACITY];
 	}
 
 	/**
@@ -50,31 +49,37 @@ public class HashTable {
 	public boolean contains(String key) {
 		Preconditions.checkArgument(key != null,
 				"First argument to contains(String key) is null");
-		int index = calculateDesiredPositionOfKey(key);
+		int index = calculateDesiredPositionOfKey(key, currentCapacity);
 		return searchForKeyFromIndex(key, index).isPresent();
 	}
 
-	private int calculateDesiredPositionOfKey(String key) {
-		return hash(key) % currentCapacity;
+	private int calculateDesiredPositionOfKey(String key, int modulus) {
+		return hash(key) % modulus;
 	}
 
 	private Optional<Integer> searchForKeyFromIndex(String key, int index) {
-		if (key.equals(table[index])) {
+        if (table[index] == null) {
+            return Optional.empty();
+        }
+		if (key.equals(table[index].getKey())) {
 			return Optional.of(index);
 		} else {
-			return searchForKeyForwardOfIndex(key, index + 1, index);
+			return searchForKeyForwardOfIndex(key, ((index + 1) % currentCapacity), index);
 		}
 	}
 
 	private Optional<Integer> searchForKeyForwardOfIndex(String key, int currentIndex,
 															 int finalIndex) {
-		if (key.equals(table[currentIndex])) {
+        if (table[currentIndex] == null) {
+            return Optional.empty();
+        }
+		if (key.equals(table[currentIndex].getKey())) {
 			return Optional.of(currentIndex);
 		} else {
 			if (currentIndex == finalIndex) {
 				return Optional.empty();
 			} else {
-				return searchForKeyForwardOfIndex(key, (currentIndex + 1 % currentCapacity), finalIndex);
+				return searchForKeyForwardOfIndex(key, ((currentIndex + 1) % currentCapacity), finalIndex);
 			}
 		}
 	}
@@ -88,12 +93,9 @@ public class HashTable {
 	 */
 	public synchronized String get(String key) {
 		Preconditions.checkArgument(key != null, "first argument to get(String key) is null");
-		// Finds the key.
-		int index = hash(key) % currentCapacity;
-		while (!key.equals(table[index].getKey())) {
-			index = (index + 1) % currentCapacity;
-		}
-		return table[index] != null ? table[index].getValue() : null;
+		int startIndex = calculateDesiredPositionOfKey(key, currentCapacity);
+		Optional<Integer> index = searchForKeyFromIndex(key, startIndex);
+		return index.isPresent() ? table[index.get()].getValue() : null;
 	}
 
 	/**
@@ -105,19 +107,44 @@ public class HashTable {
 	 */
 	public synchronized void put(String key, String value) {
 		Preconditions.checkArgument(key != null, "first argument to put(String key, ...) is null");
-		int index = hash(key) % currentCapacity;
+		int startIndex = calculateDesiredPositionOfKey(key, currentCapacity);
 		Preconditions.checkArgument(value != null, "second argument to put(..., String value) is null");
-		while (table[index] != null && !key.equals(table[index].getKey())) {
-			index = (index + 1) % currentCapacity;
-		}
+		Optional<Integer> index = putKeyFromIndex(key, startIndex, table, currentCapacity);
+
+        if (!index.isPresent()) {
+            resizeIfRequired();
+            put(key, value);
+            return;
+        }
 
 		// Increases the size if a new key is being put in.
-		if (table[index] == null) {
+		if (table[index.get()] == null) {
 			currentSize++;
 		}
-		table[index] = ImmutableHashEntry.builder().key(key).value(value).build();
+		table[index.get()] = ImmutableHashEntry.builder().key(key).value(value).build();
 
 		resizeIfRequired();
+	}
+
+	private Optional<Integer> putKeyFromIndex(String key, int index, HashEntry[] entries, int capacity) {
+		if (entries[index] == null || key.equals(entries[index].getKey())) {
+			return Optional.of(index);
+		} else {
+			return putKeyForwardOfIndex(key, ((index + 1) % capacity), index, entries, capacity);
+		}
+	}
+
+	private Optional<Integer> putKeyForwardOfIndex(String key, int currentIndex,
+												   int finalIndex, HashEntry[] entries, int capacity) {
+		if (entries[currentIndex] == null || key.equals(entries[currentIndex].getKey())) {
+			return Optional.of(currentIndex);
+		} else {
+			if (currentIndex == finalIndex) {
+				return Optional.empty();
+			} else {
+				return putKeyForwardOfIndex(key, ((currentIndex + 1) % capacity), finalIndex, entries, capacity);
+			}
+		}
 	}
 
 	/**
@@ -139,31 +166,38 @@ public class HashTable {
 	 * Resizes the underlying array if required.
 	 */
 	private void resizeIfRequired() {
-		if (!((currentSize < currentCapacity * MIN_LOAD && currentCapacity > MIN_CAPACITY)
-				|| currentSize > currentCapacity * MAX_LOAD)) {
+		if (!(lessThanMinimumLoad() || moreThanMaximumLoad())) {
 			return;
 		}
 		int newCapacity = (int) (currentSize / RESIZE_LOAD);
 
-		@SuppressWarnings("unchecked")
-		// Makes the new array.
 		HashEntry[] newArray = new HashEntry[newCapacity];
 
-		for (int oldIndex = 0; oldIndex < currentCapacity; oldIndex++) {
-			HashEntry oldEntry = table[oldIndex];
-			if (oldEntry == null) {
-				continue;
-			}
-			int index = hash(oldEntry.getKey()) % newCapacity;
-			while (newArray[index] != null && !oldEntry.getKey().equals(newArray[index].getKey())) {
-				// Gets the next index.
-				index = (index + 1) % newCapacity;
-			}
-			newArray[index] = oldEntry;
-		}
-		table = newArray;
+        copyArray(newCapacity, newArray);
+        table = newArray;
 		currentCapacity = newCapacity;
 	}
+
+    private void copyArray(int newCapacity, HashEntry[] newArray) {
+        for (int oldIndex = 0; oldIndex < currentCapacity; oldIndex++) {
+            HashEntry oldEntry = table[oldIndex];
+            if (oldEntry != null) {
+                int startIndex = calculateDesiredPositionOfKey(oldEntry.getKey(), newCapacity);
+                Optional<Integer> index = putKeyFromIndex(oldEntry.getKey(), startIndex, newArray, newCapacity);
+                if (index.isPresent()) {
+newArray[index.get()] = oldEntry;
+}
+            }
+        }
+    }
+
+    private boolean moreThanMaximumLoad() {
+        return currentSize > currentCapacity * MAX_LOAD;
+    }
+
+    private boolean lessThanMinimumLoad() {
+        return currentSize < currentCapacity * MIN_LOAD && currentCapacity > MIN_CAPACITY;
+    }
 
 	/**
 	 * Gets the size of the table.
@@ -179,8 +213,8 @@ public class HashTable {
 	 * 
 	 * @return Returns the set of all keys.
 	 */
-	public Set<String> getAll() {
-		Set<String> keys = new HashSet<String>(currentSize);
+	public HashSet<String> getAll() {
+		HashSet<String> keys = new HashSet<String>(currentSize);
 		for (HashEntry entry : table) {
 			if (entry != null) {
 				keys.add(entry.getKey());
@@ -192,27 +226,31 @@ public class HashTable {
 	/**
 	 * Removes the key from the hashtable.
 	 * 
-	 * @param key is the key to be deleted.
+	 * @param key the key to be deleted.
 	 * @throws IllegalArgumentException is thrown if key is null.
 	 */
 	public void delete(String key) {
 		Preconditions.checkArgument(key != null, "first argument to delete(String key) is null");
 		List<HashEntry> entries = new ArrayList<HashEntry>();
 
-		// Locates the key.
-		int index = hash(key) % currentCapacity;
-		while (table[index] != null && !key.equals(table[index].getKey())) {
-			index = (index + 1) % currentCapacity;
-			if (table[index] == null) System.out.printf("Key %s already deleted %n", key.toString());
-		}
+        int startIndex = calculateDesiredPositionOfKey(key, currentCapacity);
+
+        Optional<Integer> optionalIndex = putKeyFromIndex(key, startIndex, table, currentCapacity);
+
+        if (!optionalIndex.isPresent()) {
+            //System.out.printf("Key %s already deleted %n", key.toString());
+            return;
+        }
+
+        int index = optionalIndex.get();
+
+        if (table[index] == null) {
+            //System.out.printf("Key %s already deleted %n", key.toString());
+            return;
+        }
 
 		// Extracts keys that collided with this key.
-		while (table[index] != null) {
-			entries.add(table[index]);
-			table[index] = null;
-			currentSize--;
-			index = (index + 1) % currentCapacity;
-		}
+		extractContiguousElements(entries, index);
 
 		// Ignore the key to be deleted.
 		entries.remove(0);
@@ -220,6 +258,15 @@ public class HashTable {
 		for (HashEntry entry : entries) {
 			// Puts the rest back in the hashtable, so that the linear probe is maintained.
 			this.put(entry.getKey(), entry.getValue());
+		}
+	}
+
+	private void extractContiguousElements(List<HashEntry> entries, int index) {
+		while (table[index] != null) {
+			entries.add(table[index]);
+			table[index] = null;
+			currentSize--;
+			index = (index + 1) % currentCapacity;
 		}
 	}
 }

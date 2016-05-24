@@ -7,6 +7,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import java.util.ArrayList;
+import java.util.HashSet;
+
 import org.junit.rules.ExpectedException;
 import org.junit.Rule;
 
@@ -40,11 +42,13 @@ public class HashTableTest {
      * Checks whether hashtables throw IllegalArgumentException when passed null values.
      */
     @Test
-    public void identifiesIllegalArguments() {
-        exception.expect(IllegalArgumentException.class);
-        listIntegerTable.get(null);
+    public void cannotGetNull() {
         exception.expect(IllegalArgumentException.class);
         stringListTable.get(null);
+    }
+
+    @Test
+    public void cannotPutNull() {
         exception.expect(IllegalArgumentException.class);
         stringListTable.put("k",null);
     }
@@ -75,8 +79,34 @@ public class HashTableTest {
         for (int i = 0; i < 1000; i++) {
             stringListTable.put(Integer.toString(i), Integer.toString(i));
             listIntegerTable.put(Integer.toString(i), Integer.toString(i));
+            assertEquals(true, stringListTable.contains(Integer.toString(i)));
+            assertEquals(false, stringListTable.contains(Integer.toString(10000)));
             assertEquals(Integer.toString(i), stringListTable.get(Integer.toString(i)));
             assertEquals(Integer.toString(i), listIntegerTable.get(Integer.toString(i)));
         }
+    }
+
+    @Test
+    public void canDeleteEntries() {
+        for (int i = 0; i < 750; i++) {
+            stringListTable.put(Integer.toString(i), Integer.toString(i));
+            assertEquals(true, stringListTable.contains(Integer.toString(i)));
+        }
+        for (int i = 0; i < 750; i++) {
+            stringListTable.delete(Integer.toString(i));
+            assertEquals(false, stringListTable.contains(Integer.toString(i)));
+            stringListTable.delete(Integer.toString(i));
+        }
+    }
+
+    @Test
+    public void canGetSetOfKeys() {
+        HashSet<String> entries = new HashSet<>();
+        for (int i = 0; i < 1000; i++) {
+            stringListTable.put(Integer.toString(i), Integer.toString(i));
+            entries.add(Integer.toString(i));
+        }
+        HashSet<String> keys = stringListTable.getAll();
+        assertEquals(true, keys.equals(entries));
     }
 }
