@@ -1,33 +1,28 @@
 package com.louis;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import java.util.ArrayList;
-import java.util.HashSet;
 
+import org.junit.Test;
+import java.util.HashSet;
 import org.junit.rules.ExpectedException;
 import org.junit.Rule;
 
 /**
  * Tests for {@link HashTable}.
- * 
+ *
  * @author Louis Ashton  (louisashton@live.com)
  */
 public class HashTableTest {
-    
+
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-    
+
     HashTable listIntegerTable = new HashTable();
     HashTable stringListTable = new HashTable();
-    
+
     /**
      * Tests construction of hashtables.
-     * 
+     *
      * Checks whether hashtables of various types can be constructed.
      */
     @Test
@@ -35,10 +30,10 @@ public class HashTableTest {
         assertEquals(listIntegerTable.size(), 0);
         assertEquals(stringListTable.size(), 0);
     }
-    
+
     /**
      * Tests illegal argument exceptions.
-     * 
+     *
      * Checks whether hashtables throw IllegalArgumentException when passed null values.
      */
     @Test
@@ -50,12 +45,12 @@ public class HashTableTest {
     @Test
     public void cannotPutNull() {
         exception.expect(IllegalArgumentException.class);
-        stringListTable.put("k",null);
+        stringListTable.put("k", null);
     }
-    
+
     /**
      * Tests addition to hashtables.
-     * 
+     *
      * Checks whether entries can be put into the hashtables.
      */
     @Test
@@ -67,12 +62,12 @@ public class HashTableTest {
             assertEquals(i + 1, listIntegerTable.size());
         }
     }
-    
+
     /**
      * Tests hashtable search.
-     * 
-     * Checks whether entries can be retrieved from the hashtables.
-     * Does not discern whether values were stored incorrectly, or retrieved incorrectly.
+     *
+     * Checks whether entries can be retrieved from the hashtables. Does not discern whether values
+     * were stored incorrectly, or retrieved incorrectly.
      */
     @Test
     public void canGetEntries() {
