@@ -1,8 +1,9 @@
 build
 .gradle
-HackerRank
+HackerRank/
 .metadata
 .recommenders
-HackerRank.ipr
+*.ipr
 HackerRank.iws
+.idea/modules/HackerRank.iml
 .idea
