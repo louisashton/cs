@@ -3,3 +3,6 @@ build
 HackerRank
 .metadata
 .recommenders
+HackerRank.ipr
+HackerRank.iws
+.idea
