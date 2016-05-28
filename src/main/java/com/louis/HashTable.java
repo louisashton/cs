@@ -65,7 +65,9 @@ public class HashTable {
         if (key.equals(table[index].getKey())) {
             return Optional.of(index);
         } else {
-            return getLocationOfKeyAfterIndex(key, index + 1  % currentCapacity, index);
+            int followingIndex = index + 1;
+            int nextIndex = followingIndex % currentCapacity;
+            return getLocationOfKeyAfterIndex(key, nextIndex, index);
         }
     }
 
@@ -80,7 +82,9 @@ public class HashTable {
             if (currentIndex == finalIndex) {
                 return Optional.empty();
             } else {
-                return getLocationOfKeyAfterIndex(key, currentIndex + 1 % currentCapacity, finalIndex);
+                int followingIndex = currentIndex + 1;
+                int nextIndex = followingIndex % currentCapacity;
+                return getLocationOfKeyAfterIndex(key, nextIndex, finalIndex);
             }
         }
     }
@@ -125,7 +129,9 @@ public class HashTable {
         if (possiblyCollidedEntries[index] == null || key.equals(possiblyCollidedEntries[index].getKey())) {
             return index;
         } else {
-            return getFirstEligibleIndex(key, index + 1 % capacity, possiblyCollidedEntries, capacity);
+            int followingIndex = index + 1;
+            int nextIndex = followingIndex % capacity;
+            return getFirstEligibleIndex(key, nextIndex, possiblyCollidedEntries, capacity);
         }
     }
 
