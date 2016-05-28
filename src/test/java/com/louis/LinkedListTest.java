@@ -2,8 +2,6 @@ package com.louis;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.Rule;
 
 import java.util.ListIterator;
 
@@ -13,9 +11,6 @@ import java.util.ListIterator;
  * @author Louis Ashton  (louisashton@live.com)
  */
 public class LinkedListTest {
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     LinkedList<Integer> list = new LinkedList<>();
 
@@ -29,14 +24,13 @@ public class LinkedListTest {
      *
      * Checks whether Linkedlists throw IllegalArgumentException when passed null values.
      */
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void cannotContainNull() {
-        exception.expect(IllegalArgumentException.class);
         list.contains(null);
     }
-    @Test
+
+    @Test(expected = IllegalArgumentException.class)
     public void cannotAddNull() {
-        exception.expect(IllegalArgumentException.class);
         list.add(null);
     }
 

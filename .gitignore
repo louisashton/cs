@@ -2,6 +2,8 @@ build
 .gradle
 .metadata
 .recommenders
+.idea
+HackerRank.ipr
 # User-specific stuff:
 .idea/workspace.xml
 .idea/tasks.xml
