@@ -1,3 +1,7 @@
+// CHECKSTYLE:OFF
+
+// CHECKSTYLE:ON
+
 package com.louis;
 
 import org.immutables.value.Value;
