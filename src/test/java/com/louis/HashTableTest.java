@@ -2,13 +2,8 @@ package com.louis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.junit.Test;
-
 import java.util.HashSet;
-
-import org.junit.rules.ExpectedException;
-import org.junit.Rule;
 
 /**
  * Tests for {@link HashTable}.
@@ -16,9 +11,6 @@ import org.junit.Rule;
  * @author Louis Ashton  (louisashton@live.com)
  */
 public class HashTableTest {
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     HashTable table = new HashTable();
 
