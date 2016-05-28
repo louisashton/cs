@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.NoSuchElementException;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.Rule;
 
 /**
  * Tests my BinarySearchTree implementation.
@@ -14,12 +12,10 @@ import org.junit.Rule;
  */
 public class BinarySearchTreeTest {
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    private BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
 
     @Test(expected = IllegalArgumentException.class)
     public void canAddSearchAndDelete() {
-        BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
         assertEquals(0, bst.size());
         assertEquals(null, bst.get(1));
         bst.put(1, 2);
@@ -36,13 +32,11 @@ public class BinarySearchTreeTest {
 
     @Test(expected = NoSuchElementException.class)
     public void cannotDeleteFromEmptyTree() {
-        BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
         bst.deleteMin();
     }
 
     @Test
     public void canRemoveBySettingNull() {
-        BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
         bst.put(1, 2);
         assertEquals(true, bst.contains(1));
         bst.put(1, null);
@@ -51,19 +45,16 @@ public class BinarySearchTreeTest {
 
     @Test(expected = NoSuchElementException.class)
     public void emptyTreeHasNoMax() {
-        BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
         bst.max();
     }
 
     @Test(expected = NoSuchElementException.class)
     public void emptyTreeHasNoMin() {
-        BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
         bst.min();
     }
 
     @Test
     public void canMaintainOrder() {
-        BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
         bst.delete(0);
         bst.put(1, 2);
         bst.put(2, 3);

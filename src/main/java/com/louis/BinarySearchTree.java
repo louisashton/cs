@@ -1,7 +1,6 @@
 package com.louis;
 
 import java.util.NoSuchElementException;
-
 import com.google.common.base.Preconditions;
 
 /**
