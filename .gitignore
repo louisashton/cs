@@ -4,6 +4,7 @@ build
 .recommenders
 .idea
 .baseline
+!.baseline/checkstyle/checkstyle.xml
 *.ipr
 # User-specific stuff:
 .idea/workspace.xml
