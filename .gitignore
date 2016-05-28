@@ -3,6 +3,7 @@ build
 .metadata
 .recommenders
 .idea
+.baseline
 *.ipr
 # User-specific stuff:
 .idea/workspace.xml
