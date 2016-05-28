@@ -1,8 +1,8 @@
 package com.louis;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
+import org.junit.Test;
 import java.util.ListIterator;
 
 /**
@@ -41,7 +41,7 @@ public class LinkedListTest {
      */
     @Test
     public void canAddEntries() {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             list.add(i);
             assertEquals(i + 1, list.size());
         }
@@ -50,12 +50,12 @@ public class LinkedListTest {
     /**
      * Tests LinkedList search.
      *
-     * Checks whether entries can be found in the list.
-     * Does not discern whether values were stored incorrectly, or retrieved incorrectly.
+     * Checks whether entries can be found in the list. Does not discern whether values were stored
+     * incorrectly, or retrieved incorrectly.
      */
     @Test
     public void canFindEntries() {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             list.add(i);
             assertEquals(true, list.contains(i));
             assertEquals(false, list.contains(10000));
@@ -70,12 +70,12 @@ public class LinkedListTest {
     @Test
     public void canRemoveEntries() {
         assertEquals(0, list.size());
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             list.add(i);
             assertEquals(true, list.contains(i));
             list.remove(i);
             assertEquals(false, list.contains(i));
-            assertEquals(0,list.size());
+            assertEquals(0, list.size());
         }
     }
 
