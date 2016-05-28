@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir:gradle-baseline-java:0.5.0'
+        classpath group: "com.palantir", name: "gradle-baseline-java", version: gradleBaselineJavaVersion
     }
 }
 
@@ -14,10 +14,10 @@ plugins {
 }
 apply plugin: "java"
 apply plugin: "eclipse"
-apply plugin: 'com.palantir.baseline-config'
-apply plugin: 'com.palantir.baseline-checkstyle'
-apply plugin: 'com.palantir.baseline-findbugs'
-apply plugin: 'com.palantir.baseline-idea'
+apply plugin: "com.palantir.baseline-config"
+apply plugin: "com.palantir.baseline-checkstyle"
+apply plugin: "com.palantir.baseline-findbugs"
+apply plugin: "com.palantir.baseline-idea"
 
 sourceCompatibility = 1.8
 version gitVersion()
