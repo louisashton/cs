@@ -1,8 +1,12 @@
+// CHECKSTYLE:OFF
+
+// CHECKSTYLE:ON
+
 package com.louis;
 
+import com.google.common.base.Preconditions;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import com.google.common.base.Preconditions;
 
 /**
  * Implements a Linkedlist.
@@ -12,7 +16,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Louis Ashton (louisashton@live.com)
  */
-public class LinkedList<Item> implements Iterable<Item> {
+public class LinkedList<T> implements Iterable<T> {
 
     private int sizeOfList;
     private Node first;
@@ -34,7 +38,7 @@ public class LinkedList<Item> implements Iterable<Item> {
      * Each member has an item. It also stores the location of its surrounding nodes.
      */
     private class Node {
-        private Item item;
+        private T item;
         private Node next;
         private Node previous;
     }
@@ -42,7 +46,7 @@ public class LinkedList<Item> implements Iterable<Item> {
     /**
      * Returns the number of nodes in the list.
      */
-    public int size() {
+    public final int size() {
         return sizeOfList;
     }
 
@@ -52,8 +56,8 @@ public class LinkedList<Item> implements Iterable<Item> {
      * @param item the item to be added.
      * @throws IllegalArgumentException if item is null.
      */
-    public void add(Item item) {
-        Preconditions.checkArgument(item != null, "First argument to add(Item item) is null.");
+    public final void add(T item) {
+        Preconditions.checkArgument(item != null, "First argument to add(T item) is null.");
         Node penultimate = finish.previous;
         Node addition = new Node();
         addition.item = item;
@@ -68,11 +72,11 @@ public class LinkedList<Item> implements Iterable<Item> {
      * Checks the list for an item.
      *
      * @param item item is the item.
-     * @return true if key is in the BST.
+     * @return true if key is in the BST
      * @throws IllegalArgumentException if item is null.
      */
-    public boolean contains(Item item) {
-        Preconditions.checkArgument(item != null, "First argument to contains(Item item) is null.");
+    public final boolean contains(T item) {
+        Preconditions.checkArgument(item != null, "First argument to contains(T item) is null.");
         for (Node x = first; x != null; x = x.next) {
             if (item.equals(x.item)) {
                 return true;
@@ -87,8 +91,8 @@ public class LinkedList<Item> implements Iterable<Item> {
      * @param item the item.
      * @throws IllegalArgumentException if item is null.
      */
-    public void remove(Item item) {
-        Preconditions.checkArgument(item != null, "First argument to remove(Item item) is null.");
+    public final void remove(T item) {
+        Preconditions.checkArgument(item != null, "First argument to remove(T item) is null.");
 
         for (Node x = first; x.next != null; x = x.next) {
             if (item.equals(x.next.item)) {
@@ -102,9 +106,10 @@ public class LinkedList<Item> implements Iterable<Item> {
     /**
      * Creates an iterator.
      *
-     * @return Returns the iterator for the list.
+     * @return Returns the iterator for the list
      */
-    public ListIterator<Item> iterator() {
+    @Override
+    public final ListIterator<T> iterator() {
         return new LinkedListIterator();
     }
 
@@ -113,39 +118,45 @@ public class LinkedList<Item> implements Iterable<Item> {
      *
      * Each member has an item. It also stores the location of its surrounding nodes.
      */
-    private class LinkedListIterator implements ListIterator<Item> {
+    private class LinkedListIterator implements ListIterator<T> {
         private Node current = first.next;
         private Node lastAccessed = null;
         private int index = 0;
 
+        @Override
         public boolean hasNext() {
             return index < sizeOfList;
         }
 
+        @Override
         public boolean hasPrevious() {
             return index > 0;
         }
 
+        @Override
         public int previousIndex() {
             return index - 1;
         }
 
+        @Override
         public int nextIndex() {
             return index;
         }
 
-        public Item next() {
+        @Override
+        public T next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
             lastAccessed = current;
-            Item item = current.item;
+            T item = current.item;
             current = current.next;
             index++;
             return item;
         }
 
-        public Item previous() {
+        @Override
+        public T previous() {
             if (!hasPrevious()) {
                 throw new NoSuchElementException();
             }
@@ -155,13 +166,15 @@ public class LinkedList<Item> implements Iterable<Item> {
             return current.item;
         }
 
-        public void set(Item item) {
+        @Override
+        public void set(T item) {
             if (lastAccessed == null) {
                 throw new IllegalStateException();
             }
             lastAccessed.item = item;
         }
 
+        @Override
         public void remove() {
             if (lastAccessed == null) {
                 throw new IllegalStateException();
@@ -179,7 +192,8 @@ public class LinkedList<Item> implements Iterable<Item> {
             lastAccessed = null;
         }
 
-        public void add(Item item) {
+        @Override
+        public void add(T item) {
             Node before = current.previous;
             Node insertion = new Node();
             Node after = current;
