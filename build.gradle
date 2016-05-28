@@ -1,14 +1,30 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath group: "com.palantir", name: "gradle-baseline-java", version: gradleBaselineJavaVersion
+    }
+}
+
 plugins {
-  id "net.ltgt.apt" version "0.6"
+    id "net.ltgt.apt" version "0.6"
+    id "com.palantir.git-version" version "0.5.2"
 }
 apply plugin: "java"
 apply plugin: "eclipse"
+apply plugin: "com.palantir.baseline-config"
+apply plugin: "com.palantir.baseline-checkstyle"
+apply plugin: "com.palantir.baseline-findbugs"
+apply plugin: "com.palantir.baseline-idea"
 
 sourceCompatibility = 1.8
-version = "1.0"
+version gitVersion()
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
