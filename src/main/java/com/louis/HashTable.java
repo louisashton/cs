@@ -1,18 +1,21 @@
+// CHECKSTYLE:OFF
+
+// CHECKSTYLE:ON
+
 package com.louis;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
-import org.immutables.value.Value;
-import java.lang.String;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Implements a hashtable.
- *
- * Hashtables implement the associative array abstract data type. The tables contain keys and
- * associated values. A hash function computes the location of a value for a given key.
+ * <p>
+ * Hashtables implement the associative array abstract data type. The tables contain keys and associated values. A hash
+ * function computes the location of a value for a given key.
  *
  * @author Louis Ashton (louisashton@live.com)
  */
@@ -40,10 +43,10 @@ public class HashTable {
      * Returns true if key is a member of this table.
      *
      * @param key the key to check for in the table. May not be null.
-     * @return Returns true if the table contains that key.
+     * @return Returns true if the table contains that key
      * @throws IllegalArgumentException if key is null.
      */
-    public boolean contains(String key) {
+    public final boolean contains(String key) {
         Preconditions.checkArgument(key != null,
                 "First argument to contains(String key) is null");
         int index = calculatePositionOfKeyInCurrentTable(key);
@@ -65,12 +68,14 @@ public class HashTable {
         if (key.equals(table[index].getKey())) {
             return Optional.of(index);
         } else {
-            return getLocationOfKeyAfterIndex(key, ((index + 1) % currentCapacity), index);
+            int followingIndex = index + 1;
+            int nextIndex = followingIndex % currentCapacity;
+            return getLocationOfKeyAfterIndex(key, nextIndex, index);
         }
     }
 
     private Optional<Integer> getLocationOfKeyAfterIndex(String key, int currentIndex,
-                                                         int finalIndex) {
+            int finalIndex) {
         if (table[currentIndex] == null) {
             return Optional.empty();
         }
@@ -80,7 +85,9 @@ public class HashTable {
             if (currentIndex == finalIndex) {
                 return Optional.empty();
             } else {
-                return getLocationOfKeyAfterIndex(key, ((currentIndex + 1) % currentCapacity), finalIndex);
+                int followingIndex = currentIndex + 1;
+                int nextIndex = followingIndex % currentCapacity;
+                return getLocationOfKeyAfterIndex(key, nextIndex, finalIndex);
             }
         }
     }
@@ -89,10 +96,10 @@ public class HashTable {
      * Returns the value associated with a key.
      *
      * @param key the key for which to look up the value.
-     * @return The value associated with the key or null if no such value.
+     * @return The value associated with the key or null if no such value
      * @throws IllegalArgumentException if key is null.
      */
-    public synchronized String get(String key) {
+    public final String get(String key) {
         Preconditions.checkArgument(key != null, "first argument to get(String key) is null");
         int startIndex = calculatePositionOfKeyInCurrentTable(key);
         Optional<Integer> index = getLocationOfKeyAfterIndex(key, startIndex);
@@ -106,7 +113,7 @@ public class HashTable {
      * @param value is the value for this key.
      * @throws IllegalArgumentException if key or value is null.
      */
-    public synchronized void put(String key, String value) {
+    public final void put(String key, String value) {
         Preconditions.checkArgument(key != null, "first argument to put(String key, ...) is null");
         int startIndex = calculatePositionOfKeyInCurrentTable(key);
         Preconditions.checkArgument(value != null, "second argument to put(..., String value) is null");
@@ -125,7 +132,9 @@ public class HashTable {
         if (possiblyCollidedEntries[index] == null || key.equals(possiblyCollidedEntries[index].getKey())) {
             return index;
         } else {
-            return getFirstEligibleIndex(key, ((index + 1) % capacity), possiblyCollidedEntries, capacity);
+            int followingIndex = index + 1;
+            int nextIndex = followingIndex % capacity;
+            return getFirstEligibleIndex(key, nextIndex, possiblyCollidedEntries, capacity);
         }
     }
 
@@ -133,7 +142,7 @@ public class HashTable {
      * Returns an integer hash corresponding to the element.
      *
      * @param key is the key to be hashed.
-     * @return Returns the hash of the key.
+     * @return Returns the hash of the key
      */
     private int hash(String key) {
         int hashValue = key.hashCode();
@@ -180,19 +189,19 @@ public class HashTable {
     /**
      * Gets the size of the table.
      *
-     * @return Returns the number of pairs in the table.
+     * @return Returns the number of pairs in the table
      */
-    public int size() {
+    public final int size() {
         return currentSize;
     }
 
     /**
      * Returns all the keys in the hashtable.
      *
-     * @return Returns the set of all keys.
+     * @return Returns the set of all keys
      */
-    public HashSet<String> getAllKeys() {
-        HashSet<String> keys = new HashSet<>(currentSize);
+    public final Set<String> getAllKeys() {
+        Set<String> keys = new HashSet<>(currentSize);
         for (HashEntry entry : table) {
             if (entry != null) {
                 keys.add(entry.getKey());
@@ -207,7 +216,7 @@ public class HashTable {
      * @param key the key to be deleted.
      * @throws IllegalArgumentException is thrown if key is null.
      */
-    public void delete(String key) {
+    public final void delete(String key) {
         Preconditions.checkArgument(key != null, "first argument to delete(String key) is null");
         List<HashEntry> possiblyCollidedEntries = new ArrayList<>();
 
@@ -232,11 +241,12 @@ public class HashTable {
     }
 
     private void extractChainOfCollisions(List<HashEntry> possiblyCollidedEntries, int index) {
-        while (table[index] != null) {
-            possiblyCollidedEntries.add(table[index]);
-            table[index] = null;
+        int localCopyOfIndex = index;
+        while (table[localCopyOfIndex] != null) {
+            possiblyCollidedEntries.add(table[localCopyOfIndex]);
+            table[localCopyOfIndex] = null;
             currentSize--;
-            index = (index + 1) % currentCapacity;
+            localCopyOfIndex = (localCopyOfIndex + 1) % currentCapacity;
         }
     }
 }
