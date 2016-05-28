@@ -1,15 +1,16 @@
 package com.louis;
 
 import java.util.NoSuchElementException;
+
 import com.google.common.base.Preconditions;
 
 /**
  * A binary search tree implementation.
- * 
+ *
  * Binary search trees (BSTs) are derived from the associative array abstract data type. It is a
  * symbol table with keys and values; null is excluded. The tree is not balanced. Keys are
  * Comparable and the tree is sorted by them. Most operations have linear worst case complexity.
- * 
+ *
  * @author Louis Ashton (louisashton@live.com)
  */
 public class BinarySearchTree<Key extends Comparable<Key>, Value> {
@@ -19,7 +20,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * A node of a binary search tree.
-     * 
+     *
      * Each node has a key and associated value. Pointers to the node's children are also stored.
      */
     private class Node {
@@ -53,7 +54,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Gets the size of a subtree.
-     * 
+     *
      * @param node the node is the root of the subtree.
      * @return Returns the number of pairs descendant from a node.
      */
@@ -93,7 +94,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
      * Gets a key's value.
      *
      * @param node node is the root of the subtree.
-     * @param key key is the key.
+     * @param key  key is the key.
      * @return Returns the value of the key if it is in the subtree; null otherwise.
      */
     private Value get(Node node, Key key) {
@@ -112,8 +113,8 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Adds a node to the binary search tree.
-     * 
-     * @param key the key to be added.
+     *
+     * @param key   the key to be added.
      * @param value the value to be added.
      * @throws IllegalArgumentException if key is null.
      */
@@ -129,9 +130,9 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Adds a pair to a subtree.
-     * 
-     * @param node node is the root of the subtree.
-     * @param key key is the key.
+     *
+     * @param node  node is the root of the subtree.
+     * @param key   key is the key.
      * @param value value is the value.
      * @return Returns the updated root of the subtree.
      */
@@ -153,7 +154,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Removes a key from the binary search tree.
-     * 
+     *
      * @param key the key to be deleted.
      * @throws IllegalArgumentException if key is null.
      */
@@ -164,9 +165,9 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Removes a key from a subtree.
-     * 
+     *
      * @param node node is the root of the subtree.
-     * @param key key is the key.
+     * @param key  key is the key.
      * @return Returns the updated root of the subtree.
      */
     private Node delete(Node node, Key key) {
