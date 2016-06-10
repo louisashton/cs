@@ -1,7 +1,3 @@
-// CHECKSTYLE:OFF
-
-// CHECKSTYLE:ON
-
 package com.louis;
 
 import com.google.common.base.Preconditions;
@@ -44,7 +40,7 @@ public class HashTable {
      *
      * @param key the key to check for in the table. May not be null.
      * @return Returns true if the table contains that key
-     * @throws IllegalArgumentException if key is null.
+     * @throws IllegalArgumentException if key is null
      */
     public final boolean contains(String key) {
         Preconditions.checkArgument(key != null,
@@ -95,9 +91,9 @@ public class HashTable {
     /**
      * Returns the value associated with a key.
      *
-     * @param key the key for which to look up the value.
+     * @param key the key for which to look up the value
      * @return The value associated with the key or null if no such value
-     * @throws IllegalArgumentException if key is null.
+     * @throws IllegalArgumentException if key is null
      */
     public final String get(String key) {
         Preconditions.checkArgument(key != null, "first argument to get(String key) is null");
@@ -109,9 +105,9 @@ public class HashTable {
     /**
      * Adds a key and its value to the table.
      *
-     * @param key is the key to be added.
-     * @param value is the value for this key.
-     * @throws IllegalArgumentException if key or value is null.
+     * @param key is the key to be added
+     * @param value is the value for this key
+     * @throws IllegalArgumentException if key or value is null
      */
     public final void put(String key, String value) {
         Preconditions.checkArgument(key != null, "first argument to put(String key, ...) is null");
@@ -141,7 +137,7 @@ public class HashTable {
     /**
      * Returns an integer hash corresponding to the element.
      *
-     * @param key is the key to be hashed.
+     * @param key is the key to be hashed
      * @return Returns the hash of the key
      */
     private int hash(String key) {
@@ -213,8 +209,8 @@ public class HashTable {
     /**
      * Removes the key from the hashtable.
      *
-     * @param key the key to be deleted.
-     * @throws IllegalArgumentException is thrown if key is null.
+     * @param key the key to be deleted
+     * @throws IllegalArgumentException is thrown if key is null
      */
     public final void delete(String key) {
         Preconditions.checkArgument(key != null, "first argument to delete(String key) is null");

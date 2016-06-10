@@ -1,7 +1,3 @@
-// CHECKSTYLE:OFF
-
-// CHECKSTYLE:ON
-
 package com.louis;
 
 import static org.junit.Assert.assertEquals;
