@@ -49,8 +49,8 @@ public class LinkedList<T> implements Iterable<T> {
     /**
      * Adds a node to the list.
      *
-     * @param item the item to be added.
-     * @throws IllegalArgumentException if item is null.
+     * @param item the item to be added
+     * @throws IllegalArgumentException if item is null
      */
     public final void add(T item) {
         Preconditions.checkArgument(item != null, "First argument to add(T item) is null.");
@@ -69,7 +69,7 @@ public class LinkedList<T> implements Iterable<T> {
      *
      * @param item item is the item.
      * @return true if key is in the BST
-     * @throws IllegalArgumentException if item is null.
+     * @throws IllegalArgumentException if item is null
      */
     public final boolean contains(T item) {
         Preconditions.checkArgument(item != null, "First argument to contains(T item) is null.");
@@ -84,8 +84,8 @@ public class LinkedList<T> implements Iterable<T> {
     /**
      * Removes an item from the list.
      *
-     * @param item the item.
-     * @throws IllegalArgumentException if item is null.
+     * @param item the item
+     * @throws IllegalArgumentException if item is null
      */
     public final void remove(T item) {
         Preconditions.checkArgument(item != null, "First argument to remove(T item) is null.");
