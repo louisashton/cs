@@ -3,7 +3,6 @@ build
 .metadata
 .recommenders
 .idea
-.baseline
 *.ipr
 # User-specific stuff:
 .idea/workspace.xml
@@ -46,5 +45,3 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-
-!.baseline/checkstyle/checkstyle.xml

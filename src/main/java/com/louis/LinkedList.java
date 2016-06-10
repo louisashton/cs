@@ -1,7 +1,3 @@
-// CHECKSTYLE:OFF
-
-// CHECKSTYLE:ON
-
 package com.louis;
 
 import com.google.common.base.Preconditions;
