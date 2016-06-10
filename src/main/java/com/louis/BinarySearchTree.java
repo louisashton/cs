@@ -1,7 +1,3 @@
-// CHECKSTYLE:OFF
-
-// CHECKSTYLE:ON
-
 package com.louis;
 
 import com.google.common.base.Preconditions;
@@ -11,7 +7,7 @@ import java.util.NoSuchElementException;
  * A binary search tree implementation.
  * <p>
  * Binary search trees (BSTs) are derived from the associative array abstract data type. It is a symbol table with keys
- * and values; null is excluded. The tree is not balanced. Ks are Comparable and the tree is sorted by them. Most
+ * and values; null is excluded. The tree is not balanced. Keys are Comparable and the tree is sorted by them. Most
  * operations have linear worst case complexity.
  *
  * @author Louis Ashton (louisashton@live.com)
