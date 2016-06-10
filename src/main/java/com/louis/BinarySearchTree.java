@@ -22,6 +22,7 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
      * Each node has a key and associated value. Pointers to the node's children are also stored.
      */
     private class Node {
+
         private K key;
         private V value;
         private Node leftSubtree;
@@ -85,7 +86,7 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
      */
     public final V get(K key) {
         Preconditions.checkArgument(key != null, "First argument to get(K key) is null.");
-        return get(root, key);
+        return getInsideSubtree(root, key);
     }
 
     /**
@@ -95,15 +96,15 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
      * @param key key is the key.
      * @return Returns the value of the key if it is in the subtree; null otherwise
      */
-    private V get(Node node, K key) {
+    private V getInsideSubtree(Node node, K key) {
         if (node == null) {
             return null;
         }
         int cmp = key.compareTo(node.key);
         if (cmp < 0) {
-            return get(node.leftSubtree, key);
+            return getInsideSubtree(node.leftSubtree, key);
         } else if (cmp > 0) {
-            return get(node.rightSubtree, key);
+            return getInsideSubtree(node.rightSubtree, key);
         } else {
             return node.value;
         }

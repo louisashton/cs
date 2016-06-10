@@ -2,6 +2,7 @@ package com.louis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -17,17 +18,35 @@ public class BinarySearchTreeTest {
 
     private BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<>();
 
-    @Test(expected = IllegalArgumentException.class)
-    public final void canAddSearchAndDelete() {
-        assertEquals(0, bst.size());
+    @Test
+    public final void canConstructHBinarySearchTrees() {
+        assertNotNull(bst);
+    }
+
+    @Test
+    public final void cannotGetFromEmptyTree() {
         assertNull(bst.get(1));
+    }
+
+    @Test
+    public final void canAdd() {
         bst.put(1, 2);
         assertTrue(bst.contains(1));
         assertEquals(1, bst.size());
         assertFalse(bst.contains(2));
         assertEquals(Integer.valueOf(2), bst.get(1));
+    }
+
+    @Test
+    public final void canDelete() {
+        bst.put(1, 2);
+        assertTrue(bst.contains(1));
         bst.delete(1);
         assertFalse(bst.contains(1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void cannotContainNull() {
         bst.put(1, 2);
         bst.put(1, null);
         bst.contains(null);
