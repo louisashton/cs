@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
  */
 public class BinarySearchTree<K extends Comparable<K>, V> {
 
-    // The root of the binary search tree.
     private Node root;
 
     /**
@@ -48,16 +47,16 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
      * Returns the number of nodes in the binary search tree.
      */
     public final int size() {
-        return size(root);
+        return calculateSizeOfSubtreeFromNode(root);
     }
 
     /**
      * Gets the size of a subtree.
      *
-     * @param node the node is the root of the subtree.
+     * @param node The node is the root of the subtree.
      * @return Returns the number of pairs descendant from a node
      */
-    private int size(Node node) {
+    private int calculateSizeOfSubtreeFromNode(Node node) {
         if (node == null) {
             return 0;
         } else {
@@ -68,9 +67,9 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     /**
      * Checks the binary search tree for a key.
      *
-     * @param key the key that is to be found.
+     * @param key the key that is to be found
      * @return true if key is in the binary search tree
-     * @throws IllegalArgumentException if key is null.
+     * @throws IllegalArgumentException if key is null
      */
     public final boolean contains(K key) {
         Preconditions.checkArgument(key != null, "first argument to contains(K key) is null");
@@ -80,9 +79,9 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     /**
      * Gets a key's value.
      *
-     * @param key the key whose value is sought.
+     * @param key the key whose value is sought
      * @return Returns the value of the key if it is in the binary search tree; null otherwise
-     * @throws IllegalArgumentException if key is null.
+     * @throws IllegalArgumentException if key is null
      */
     public final V get(K key) {
         Preconditions.checkArgument(key != null, "First argument to get(K key) is null.");
@@ -113,9 +112,9 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     /**
      * Adds a node to the binary search tree.
      *
-     * @param key the key to be added.
-     * @param value the value to be added.
-     * @throws IllegalArgumentException if key is null.
+     * @param key the key to be added
+     * @param value the value to be added
+     * @throws IllegalArgumentException if key is null
      */
     public final void put(K key, V value) {
         Preconditions.checkArgument(key != null,
@@ -147,15 +146,16 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         } else {
             node.value = value;
         }
-        node.sizeOfSubtree = 1 + size(node.leftSubtree) + size(node.rightSubtree);
+        node.sizeOfSubtree = 1 + calculateSizeOfSubtreeFromNode(node.leftSubtree) + calculateSizeOfSubtreeFromNode(
+                node.rightSubtree);
         return node;
     }
 
     /**
      * Removes a key from the binary search tree.
      *
-     * @param key the key to be deleted.
-     * @throws IllegalArgumentException if key is null.
+     * @param key the key to be deleted
+     * @throws IllegalArgumentException if key is null
      */
     public final void delete(K key) {
         Preconditions.checkArgument(key != null, "First argument to delete(K key) is null.");
@@ -191,7 +191,9 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
                 copyOfNode.leftSubtree = topNode.leftSubtree;
             }
         }
-        copyOfNode.sizeOfSubtree = size(copyOfNode.leftSubtree) + size(copyOfNode.rightSubtree) + 1;
+        copyOfNode.sizeOfSubtree =
+                calculateSizeOfSubtreeFromNode(copyOfNode.leftSubtree) + calculateSizeOfSubtreeFromNode(
+                        copyOfNode.rightSubtree) + 1;
         return copyOfNode;
     }
 
@@ -219,7 +221,9 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
             return node.rightSubtree;
         }
         node.leftSubtree = deleteMin(node.leftSubtree);
-        node.sizeOfSubtree = size(node.leftSubtree) + size(node.rightSubtree) + 1;
+        node.sizeOfSubtree =
+                calculateSizeOfSubtreeFromNode(node.leftSubtree) + calculateSizeOfSubtreeFromNode(node.rightSubtree)
+                        + 1;
         return node;
     }
 
@@ -254,7 +258,7 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
      * Finds the binary search tree's maximum.
      *
      * @return Returns the largest key in the symbol table
-     * @throws NoSuchElementException if the symbol table is empty.
+     * @throws NoSuchElementException if the symbol table is empty
      */
     public final K max() {
         if (size() == 0) {
